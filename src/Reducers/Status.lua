@@ -12,7 +12,7 @@ local Cryo = require(Plugin.Cryo)
 local SetHasFocus = require(Plugin.Src.Actions.SetHasFocus)
 local SetIsOpen = require(Plugin.Src.Actions.SetIsOpen)
 local SetIsPlaying = require(Plugin.Src.Actions.SetIsPlaying)
-local SetCurrentInstance = require(Plugin.Src.Actions.SetIsPlaying)
+local SetCurrentInstance = require(Plugin.Src.Actions.SetCurrentInstance)
 
 local function Status(state, action)
 	state = state or {

@@ -65,10 +65,10 @@ local function WriteTween(tweenTable, name)
 
 	tween = addLineClose(indent, tween)
 
-	local module = Instance.new("ModuleScript")
-	module.Source = tween
-	module.Name = name
-	return module
+	local mod = Instance.new("ModuleScript")
+	mod.Source = tween
+	mod.Name = name
+	return mod
 end
 
 return WriteTween

@@ -2,6 +2,7 @@ local Plugin = script.Parent.Parent.Parent
 
 local createSignal = require(Plugin.Src.Util.createSignal)
 local Cryo = require(Plugin.Cryo)
+local Constants = require(Plugin.Src.Util.Constants)
 
 local Theme = {}
 
@@ -76,6 +77,24 @@ function Theme:recalculateTheme()
 
 		backgroundColor = color(c.MainBackground),
 		mainText = color(c.MainText),
+
+		cancelButton = {
+			ButtonColor = color(c.Button),
+			ButtonColor_Hover = color(c.Button, m.Hover),
+			ButtonColor_Disabled = color(c.Button, m.Disabled),
+			TextColor = color(c.MainText),
+			TextColor_Disabled = color(c.DimmedText),
+			BorderColor = color(c.Border),
+		},
+
+		defaultButton = {
+			ButtonColor = isDark and color(c.MainButton) or color(c.CurrentMarker),
+			ButtonColor_Hover = color(c.LinkText),
+			ButtonColor_Disabled = isDark and color(c.Button, m.Disabled) or Constants.BLUE_DISABLED,
+			TextColor = Color3.new(1, 1, 1),
+			TextColor_Disabled = isDark and color(c.DimmedText) or Color3.new(1, 1, 1),
+			BorderColor = color(c.Light),
+		},
 --[[
 		hyperlink = color(c.LinkText),
 		warningColor = color(c.WarningText),
@@ -163,24 +182,6 @@ function Theme:recalculateTheme()
 		thumbnailDrag = {
 			background = color(c.CurrentMarker, m.Selected),
 			border = color(c.CurrentMarker, m.Selected),
-		},
-
-		cancelButton = {
-			ButtonColor = color(c.Button),
-			ButtonColor_Hover = color(c.Button, m.Hover),
-			ButtonColor_Disabled = color(c.Button, m.Disabled),
-			TextColor = color(c.MainText),
-			TextColor_Disabled = color(c.DimmedText),
-			BorderColor = color(c.Border),
-		},
-
-		defaultButton = {
-			ButtonColor = isDark and color(c.MainButton) or color(c.CurrentMarker),
-			ButtonColor_Hover = color(c.LinkText),
-			ButtonColor_Disabled = isDark and color(c.Button, m.Disabled) or Constants.BLUE_DISABLED,
-			TextColor = Color3.new(1, 1, 1),
-			TextColor_Disabled = isDark and color(c.DimmedText) or Color3.new(1, 1, 1),
-			BorderColor = color(c.Light),
 		},
 ]]
 	})
