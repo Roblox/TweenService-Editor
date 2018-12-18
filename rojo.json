@@ -1,0 +1,34 @@
+{
+  "name": "TweenSequenceEditor",
+  "servePort": 8000,
+  "partitions": {
+  	"src": {
+  		"path": "src",
+  		"target": "ReplicatedStorage.TweenSequenceEditor.Src"
+  	},
+  	"Roact": {
+  		"path": "submodules/Roact/lib",
+  		"target": "ReplicatedStorage.TweenSequenceEditor.Roact"
+  	},
+    "Rodux": {
+      "path": "submodules/Rodux/lib",
+      "target": "ReplicatedStorage.TweenSequenceEditor.Rodux"
+    },
+    "Roact-Rodux": {
+      "path": "submodules/Roact-Rodux/lib",
+      "target": "ReplicatedStorage.TweenSequenceEditor.RoactRodux"
+    },
+    "Cryo": {
+      "path": "submodules/Cryo/lib",
+      "target": "ReplicatedStorage.TweenSequenceEditor.Cryo"
+    },
+    "Promise": {
+      "path": "submodules/Promise/lib",
+      "target": "ReplicatedStorage.TweenSequenceEditor.Promise"
+    },
+    "TestEZ": {
+      "path": "submodules/TestEZ/lib",
+      "target": "ReplicatedStorage.TweenSequenceEditor.TestEZ"
+    }
+  }
+}
