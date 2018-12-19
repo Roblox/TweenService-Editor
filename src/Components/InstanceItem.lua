@@ -20,16 +20,16 @@ local InstanceItem = Roact.PureComponent:extend("InstanceItem")
 function InstanceItem:init(initialProps)
 	local root = initialProps.Root
 	local instance = initialProps.Instance
-	local oldPath = PathUtils.RelativePath(root, instance)
+	self.oldPath = PathUtils.RelativePath(root, instance)
 
 	self.changed = function()
 		local newPath = PathUtils.RelativePath(root, instance)
-		self.props.InstanceChanged(oldPath, newPath)
-		oldPath = newPath
+		newPath = self.props.InstanceChanged(self.oldPath, newPath, instance, root)
+		self.oldPath = newPath
 	end
 
 	self.nameConnection = instance:GetPropertyChangedSignal("Name"):Connect(self.changed)
-	self.parentConnection = instance:GetPropertyChangedSignal("Parent"):Connect(self.changed)
+	self.ancestryConnection = instance.AncestryChanged:Connect(self.changed)
 end
 
 function InstanceItem:willUnmount()
@@ -39,12 +39,17 @@ function InstanceItem:willUnmount()
 	if self.parentConnection then
 		self.parentConnection:Disconnect()
 	end
+	if self.ancestryConnection then
+		self.ancestryConnection:Disconnect()
+	end
 end
 
 function InstanceItem:render()
 	local name = self.props.Name
 	local instance = self.props.Instance
 	local expanded = self.props.Expanded
+
+	self.oldPath = PathUtils.RelativePath(self.props.Root, instance)
 
 	return withTheme(function(theme)
 		return Roact.createElement(ListItem, {
@@ -54,7 +59,7 @@ function InstanceItem:render()
 			Selected = self.props.Selected,
 		}, {
 			Name = Roact.createElement("TextButton", {
-				TextColor3 = theme.listItem.brightText,
+				TextColor3 = self.props.Selected and theme.listItem.selectedText or theme.listItem.brightText,
 				BackgroundTransparency = 1,
 				Text = name,
 				Size = UDim2.new(1, 0, 1, 0),
@@ -72,7 +77,7 @@ function InstanceItem:render()
 					end
 				end,
 			}),
-			ExpandButton = Roact.createElement("ImageButton", {
+			ExpandButton = self.props.Expandable and Roact.createElement("ImageButton", {
 				Size = UDim2.new(0, 20, 0, 20),
 				AnchorPoint = Vector2.new(0.5, 0.5),
 				Position = UDim2.new(0, 10, 0.5, 0),
@@ -81,10 +86,10 @@ function InstanceItem:render()
 				ZIndex = 3,
 
 				[Roact.Event.Activated] = function()
-					self.props.ToggleExpanded(self.props.Path)
+					self.props.ToggleExpanded(instance:GetDebugId())
 				end,
 			}),
-			ExpandIcon = self.props.HasProps and Roact.createElement("ImageLabel", {
+			ExpandIcon = self.props.Expandable and Roact.createElement("ImageLabel", {
 				BackgroundTransparency = 1,
 				Image = expanded and Constants.EXPANDED_IMAGE or Constants.HIDDEN_IMAGE,
 				ImageColor3 = theme.listItem.brightText,
@@ -106,11 +111,11 @@ InstanceItem = RoactRodux.connect(
 	end,
 	function(dispatch)
 		return {
-			InstanceChanged = function(oldPath, newPath)
-				dispatch(InstanceChanged(oldPath, newPath))
+			InstanceChanged = function(oldPath, newPath, instance, root)
+				dispatch(InstanceChanged(oldPath, newPath, instance, root))
 			end,
-			ToggleExpanded = function(path)
-				dispatch(ToggleExpanded(path))
+			ToggleExpanded = function(id)
+				dispatch(ToggleExpanded(id))
 			end,
 		}
 	end

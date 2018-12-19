@@ -13,7 +13,7 @@ local SetHasFocus = require(Plugin.Src.Actions.SetHasFocus)
 local SetIsOpen = require(Plugin.Src.Actions.SetIsOpen)
 local SetIsPlaying = require(Plugin.Src.Actions.SetIsPlaying)
 local SetCurrentInstance = require(Plugin.Src.Actions.SetCurrentInstance)
-local SetExpandedItems = require(Plugin.Src.Actions.SetExpandedItems)
+local SetInstanceStates = require(Plugin.Src.Actions.SetInstanceStates)
 local ToggleExpanded = require(Plugin.Src.Actions.ToggleExpanded)
 
 local function Status(state, action)
@@ -22,7 +22,7 @@ local function Status(state, action)
 		IsOpen = false,
 		IsPlaying = false,
 		CurrentInstance = nil,
-		ExpandedItems = {},
+		InstanceStates = {},
 	}
 
 	if action.type == SetHasFocus.name then
@@ -41,15 +41,17 @@ local function Status(state, action)
 		return Cryo.Dictionary.join(state, {
 			CurrentInstance = action.value or Cryo.None,
 		})
-	elseif action.type == SetExpandedItems.name then
+	elseif action.type == SetInstanceStates.name then
 		return Cryo.Dictionary.join(state, {
-			ExpandedItems = action.value or {},
+			InstanceStates = action.value or {},
 		})
 	elseif action.type == ToggleExpanded.name then
-		local oldValue = state.ExpandedItems[action.path]
+		local oldValue = state.InstanceStates[action.path].Expanded
 		return Cryo.Dictionary.join(state, {
-			ExpandedItems = Cryo.Dictionary.join(state.ExpandedItems, {
-				[action.path] = not oldValue
+			InstanceStates = Cryo.Dictionary.join(state.InstanceStates, {
+				[action.path] = Cryo.Dictionary.join(state.InstanceStates[action.path], {
+					Expanded = not oldValue,
+				})
 			})
 		})
 	end

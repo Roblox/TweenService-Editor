@@ -5,16 +5,17 @@
 local Plugin = script.Parent.Parent.Parent
 local Cryo = require(Plugin.Cryo)
 local SetTweens = require(Plugin.Src.Actions.SetTweens)
-local SetExpandedItems = require(Plugin.Src.Actions.SetExpandedItems)
+local SetInstanceStates = require(Plugin.Src.Actions.SetInstanceStates)
+local PathUtils = require(Plugin.Src.Util.PathUtils)
 
-return function(path)
+return function(path, id)
 	return function(store)
 		local tweens = store:getState().Tweens.Tweens
-		local expandedItems = store:getState().Status.ExpandedItems
+		local instanceStates = store:getState().Status.InstanceStates
 
 		for name, tween in pairs(tweens) do
 			for key, _ in pairs(tween) do
-				if key == path then
+				if PathUtils.Contains(key, path) then
 					tweens = Cryo.Dictionary.join(tweens, {
 						[name] = Cryo.Dictionary.join(tweens[name], {
 							[key] = Cryo.None,
@@ -25,13 +26,13 @@ return function(path)
 			end
 		end
 
-		if expandedItems[path] ~= nil then
-			expandedItems = Cryo.Dictionary.join(expandedItems, {
-				[path] = Cryo.None,
+		if instanceStates[id] then
+			instanceStates = Cryo.Dictionary.join(instanceStates, {
+				[id] = Cryo.None,
 			})
 		end
 
-		store:dispatch(SetExpandedItems(expandedItems))
+		store:dispatch(SetInstanceStates(instanceStates))
 		store:dispatch(SetTweens(tweens))
 	end
 end

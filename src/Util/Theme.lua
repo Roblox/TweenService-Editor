@@ -94,6 +94,7 @@ function Theme:recalculateTheme()
 			light = color(c.RibbonTab, m.Default),
 			dark = color(c.RibbonTab, m.Hover),
 			selected = color(c.Item, m.Selected),
+			selectedText = isDark and color(c.BrightText) or Color3.new(1, 1, 1),
 		},
 
 		cancelButton = {

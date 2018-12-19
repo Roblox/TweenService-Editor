@@ -4,18 +4,27 @@
 
 local Plugin = script.Parent.Parent.Parent
 local Cryo = require(Plugin.Cryo)
-local SetExpandedItems = require(Plugin.Src.Actions.SetExpandedItems)
+local SetInstanceStates = require(Plugin.Src.Actions.SetInstanceStates)
+local PathUtils = require(Plugin.Src.Util.PathUtils)
+local fixCollisions = require(Plugin.Src.Util.fixCollisions)
 
-return function(path)
+return function(instance, root, id)
 	return function(store)
-		local expandedItems = store:getState().Status.ExpandedItems
+		local path = PathUtils.RelativePath(root, instance)
+		local instanceStates = store:getState().Status.InstanceStates
 
-		if expandedItems[path] == nil then
-			expandedItems = Cryo.Dictionary.join(expandedItems, {
-				[path] = false,
+		fixCollisions(instance, root, path)
+
+		if instanceStates[id] == nil then
+			instanceStates = Cryo.Dictionary.join(instanceStates, {
+				[id] = {
+					Expanded = true,
+					Name = instance.Name,
+					SubscribedProps = {},
+				},
 			})
 		end
 
-		store:dispatch(SetExpandedItems(expandedItems))
+		store:dispatch(SetInstanceStates(instanceStates))
 	end
 end

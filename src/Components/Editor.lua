@@ -44,7 +44,7 @@ function Editor:render()
 					CurrentTable = self.props.CurrentTable,
 					CurrentInstance = self.props.CurrentInstance,
 					Selection = self.props.Selection,
-					ExpandedItems = self.props.ExpandedItems,
+					InstanceStates = self.props.InstanceStates,
 				}),
 			}),
 		})

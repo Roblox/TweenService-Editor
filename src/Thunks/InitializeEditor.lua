@@ -8,19 +8,23 @@ local Cryo = require(Plugin.Cryo)
 local Exporting = require(Plugin.Src.Util.Exporting)
 local SetCurrentInstance = require(Plugin.Src.Actions.SetCurrentInstance)
 local SetCurrentTween = require(Plugin.Src.Actions.SetCurrentTween)
-local SetExpandedItems = require(Plugin.Src.Actions.SetExpandedItems)
+local SetInstanceStates = require(Plugin.Src.Actions.SetInstanceStates)
 local SetTweens = require(Plugin.Src.Actions.SetTweens)
 local visitDescendants = require(Plugin.Src.Util.visitDescendants)
-local PathUtils = require(Plugin.Src.Util.PathUtils)
+local fixCollisions = require(Plugin.Src.Util.fixCollisions)
 
 return function(instance)
 	return function(store)
 		local animator = Exporting.ExportAnimator(instance)
+
+		local tweens, firstTag
 		if #animator.Tweens:GetChildren() == 0 then
-			Exporting.ExportTween(instance, {}, "Default")
+			tweens = {Default = {}}
+			firstTag = "Default"
+		else
+			tweens, firstTag = Exporting.GetTweensForAnimator(animator)
 		end
 
-		local tweens, firstTag = Exporting.GetTweensForAnimator(animator)
 		store:dispatch(SetCurrentInstance(instance))
 		store:dispatch(SetTweens(tweens))
 		local firstKey = next(tweens)
@@ -32,12 +36,18 @@ return function(instance)
 			Exporting.TagAnimatorWithKey(animator, firstKey)
 		end
 
-		local expandedItems = {}
+		local instanceStates = {}
 		visitDescendants(instance, function(descendant)
-			expandedItems = Cryo.Dictionary.join(expandedItems, {
-				[PathUtils.RelativePath(instance, descendant)] = false,
+			fixCollisions(descendant, instance)
+			instanceStates = Cryo.Dictionary.join(instanceStates, {
+				[descendant:GetDebugId()] = {
+					Expanded = true,
+					Name = descendant.Name,
+					SubscribedProps = {},
+				}
 			})
 		end)
-		store:dispatch(SetExpandedItems(expandedItems))
+
+		store:dispatch(SetInstanceStates(instanceStates))
 	end
 end

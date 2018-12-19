@@ -12,6 +12,7 @@ local PathUtils = require(Plugin.Src.Util.PathUtils)
 local InstanceItem = require(Plugin.Src.Components.InstanceItem)
 local PropertyItem = require(Plugin.Src.Components.PropertyItem)
 local visitDescendants = require(Plugin.Src.Util.visitDescendants)
+local visitChildren = require(Plugin.Src.Util.visitChildren)
 
 local PropsList = Roact.PureComponent:extend("PropsList")
 
@@ -20,30 +21,29 @@ function PropsList:init()
 	self.listItems = nil
 end
 
-function PropsList:AddPropertyItem(name, parent)
+function PropsList:AddPropertyItem(name, path, parent)
 	local i = self.iterator
-	self.listItems[name .. parent] = Roact.createElement(PropertyItem, {
+	self.listItems[parent:GetDebugId() .. " " .. name] = Roact.createElement(PropertyItem, {
 		LighterColor = i % 2 == 0,
 		LayoutOrder = i,
-		Indentation = PathUtils.StepsFromRoot(parent) + 1,
+		Indentation = PathUtils.StepsFromRoot(path) + 1,
 		Property = name,
-		Parent = parent,
+		Path = path,
 	})
 	self.iterator = i + 1
 end
 
-function PropsList:AddInstanceItem(root, instance, path, selected, expanded, hasProps)
+function PropsList:AddInstanceItem(root, instance, path, selected, expandable, expanded)
 	local i = self.iterator
-	self.listItems[path] = Roact.createElement(InstanceItem, {
+	self.listItems[instance:GetDebugId()] = Roact.createElement(InstanceItem, {
 		LighterColor = i % 2 == 0,
 		LayoutOrder = i,
 		Indentation = PathUtils.StepsFromRoot(path),
 		Instance = instance,
 		Root = root,
 		Name = instance.Name,
-		Path = path,
 		Expanded = expanded,
-		HasProps = hasProps,
+		Expandable = expandable,
 		Selected = selected,
 	})
 	self.iterator = i + 1
@@ -62,7 +62,7 @@ end
 
 function PropsList:render()
 	local selection = self.props.Selection and #self.props.Selection == 1 and self.props.Selection[1]
-	local expandedItems = self.props.ExpandedItems
+	local instanceStates = self.props.InstanceStates
 
 	return withTheme(function(theme)
 		self.iterator = 1
@@ -80,16 +80,24 @@ function PropsList:render()
 
 		if currentTable then
 			visitDescendants(currentInstance, function(instance)
+				if instance == nil then return end
 				local relativePath = PathUtils.RelativePath(currentInstance, instance)
+				local id = instance:GetDebugId()
 				local props = currentTable[relativePath]
-				self:AddInstanceItem(currentInstance, instance, relativePath,
-					selection == instance, expandedItems[relativePath], props ~= nil)
-				if expandedItems[relativePath] then
-					if props then
-						for name in pairs(props) do
-							self:AddPropertyItem(name, relativePath)
+				local state = instanceStates[id]
+				if state then
+					self:AddInstanceItem(currentInstance, instance, relativePath,
+						selection == instance, props ~= nil or visitChildren(instance) > 0, state.Expanded)
+					if state.Expanded then
+						if props then
+							for name in pairs(props) do
+								self:AddPropertyItem(name, relativePath, instance)
+							end
 						end
 					end
+					return state.Expanded
+				else
+					return false
 				end
 			end)
 			self:AddSeparator(theme.header.border)

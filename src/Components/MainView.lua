@@ -48,10 +48,11 @@ function MainView:init()
 				self.removedConnection:Disconnect()
 			end
 			self.addedConnection = current.DescendantAdded:Connect(function(instance)
-				self.props.DescendantAdded(PathUtils.RelativePath(self.props.CurrentInstance, instance))
+				self.props.DescendantAdded(instance, self.props.CurrentInstance, instance:GetDebugId())
 			end)
 			self.removedConnection = current.DescendantRemoving:Connect(function(instance)
-				self.props.DescendantRemoving(PathUtils.RelativePath(self.props.CurrentInstance, instance))
+				self.props.DescendantRemoving(PathUtils.RelativePath(
+					self.props.CurrentInstance, instance), instance:GetDebugId())
 			end)
 		end
 	end
@@ -107,7 +108,7 @@ function MainView:render(props)
 				CurrentTable = self.props.CurrentTable,
 				CurrentInstance = currentInstance,
 				Selection = selection,
-				ExpandedItems = self.props.ExpandedItems,
+				InstanceStates = self.props.InstanceStates,
 			})
 		})
 	end)
@@ -119,7 +120,7 @@ MainView = RoactRodux.connect(
 		return {
 			CurrentInstance = state.Status.CurrentInstance,
 			CurrentTable = state.Tweens.Tweens and state.Tweens.Tweens[state.Tweens.CurrentTween],
-			ExpandedItems = state.Status.ExpandedItems,
+			InstanceStates = state.Status.InstanceStates,
 		}
 	end,
 	function(dispatch)
@@ -127,11 +128,11 @@ MainView = RoactRodux.connect(
 			InitializeEditor = function(instance)
 				dispatch(InitializeEditor(instance))
 			end,
-			DescendantRemoving = function(path)
-				dispatch(DescendantRemoving(path))
+			DescendantRemoving = function(path, id)
+				dispatch(DescendantRemoving(path, id))
 			end,
-			DescendantAdded = function(path)
-				dispatch(DescendantAdded(path))
+			DescendantAdded = function(instance, root, id)
+				dispatch(DescendantAdded(instance, root, id))
 			end,
 		}
 	end
