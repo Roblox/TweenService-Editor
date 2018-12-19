@@ -38,7 +38,7 @@ function InstanceSelector:render(props)
 			}
 		else
 			buttons = {
-				{Default = true, Name = "Create New", Value = true, Active = canSelect},
+				{Default = true, Name = "Create", Value = true, Active = canSelect},
 			}
 		end
 		if selectionDiffers then
@@ -58,6 +58,8 @@ function InstanceSelector:render(props)
 			InstanceName = Roact.createElement("TextLabel", {
 				BackgroundTransparency = 1,
 				Text = text,
+				Font = Enum.Font.Gotham,
+				TextSize = 16,
 				TextColor3 = theme.mainText,
 				Size = UDim2.new(1, 0, 0.5, 0),
 				AnchorPoint = Vector2.new(0, 0.5),

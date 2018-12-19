@@ -78,6 +78,24 @@ function Theme:recalculateTheme()
 		backgroundColor = color(c.MainBackground),
 		mainText = color(c.MainText),
 
+		header = {
+			background = color(c.MainBackground),
+			border = color(c.Border),
+		},
+
+		propsList = {
+			background = color(c.MainBackground),
+			border = color(c.Border),
+		},
+
+		listItem = {
+			text = color(c.MainText),
+			brightText = color(c.BrightText),
+			light = color(c.RibbonTab, m.Default),
+			dark = color(c.RibbonTab, m.Hover),
+			selected = color(c.Item, m.Selected),
+		},
+
 		cancelButton = {
 			ButtonColor = color(c.Button),
 			ButtonColor_Hover = color(c.Button, m.Hover),

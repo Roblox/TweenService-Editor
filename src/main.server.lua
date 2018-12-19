@@ -59,12 +59,13 @@ end
 local function main()
 	pluginGui = plugin:CreateDockWidgetPluginGui("TweenSequenceEditor", DOCK_WIDGET_INFO)
 	pluginGui.Title = "TweenSequence Editor"
+	pluginGui.Name = "TweenSequenceEditor"
 	plugin.Name = "TweenSequenceEditor"
 
 	local toolbar = plugin:CreateToolbar("TweenService")
 	local mainButton = toolbar:CreateButton(
 		"TweenSequence Editor",
-		"Easily create Tweens to animate objects using a visual editor",
+		"Easily create Tweens for animating almost anything",
 		ICON
 	)
 

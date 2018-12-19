@@ -7,11 +7,20 @@ local Constants = {
 BUTTON_WIDTH = 125,
 BUTTON_HEIGHT = 35,
 
+PROPS_WIDTH = 250,
+
+HEADER_HEIGHT = 25,
+ITEM_HEIGHT = 25,
+ITEM_TEXT_SIZE = 15,
+
 BLUE_DISABLED = Color3.fromRGB(153, 218, 255),
 
 ROUNDED_BACKGROUND_IMAGE = "rbxasset://textures/StudioToolbox/RoundedBackground.png",
 ROUNDED_BORDER_IMAGE = "rbxasset://textures/StudioToolbox/RoundedBorder.png",
 ROUNDED_FRAME_SLICE = Rect.new(3, 3, 13, 13),
+
+HIDDEN_IMAGE = "rbxassetid://2661642782",
+EXPANDED_IMAGE = "rbxassetid://2661642652",
 
 }
 

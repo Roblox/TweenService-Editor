@@ -105,7 +105,7 @@ function RoundTextButton:render()
 			Size = UDim2.new(1, 0, 1, 0),
 			BackgroundTransparency = 1,
 			BorderSizePixel = 0,
-			Font = Enum.Font.SourceSans,
+			Font = Enum.Font.Gotham,
 			TextColor3 = active and style.TextColor or style.TextColor_Disabled,
 			TextSize = 22,
 			Text = self.props.Name,
