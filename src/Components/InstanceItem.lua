@@ -68,6 +68,7 @@ function InstanceItem:render()
 	return withTheme(function(theme)
 		return Roact.createElement(ListItem, {
 			LighterColor = self.props.LighterColor,
+			Color = self.props.Color,
 			LayoutOrder = self.props.LayoutOrder,
 			Indentation = self.props.Indentation,
 			Selected = self.props.Selected,

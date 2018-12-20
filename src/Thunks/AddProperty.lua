@@ -8,13 +8,28 @@ local PathUtils = require(Plugin.Src.Util.PathUtils)
 local SetTweens = require(Plugin.Src.Actions.SetTweens)
 local SetPolling = require(Plugin.Src.Actions.SetPolling)
 
+local function isValidProperty(prop)
+	local valType = typeof(prop)
+	return valType == "number" or
+		valType == "bool" or
+		valType == "CFrame" or
+		valType == "Vector3" or
+		valType == "Vector3int16" or
+		valType == "Vector2" or
+		valType == "Rect" or
+		valType == "Color3" or
+		valType == "UDim" or
+		valType == "UDim2" or
+		valType == "UDim2"
+end
+
 return function(instance, prop, root)
 	return function(store)
-		if instance == nil then
+		store:dispatch(SetPolling(Cryo.None))
+
+		if instance == nil or prop == nil or prop == "" then
 			return false
 		end
-
-		store:dispatch(SetPolling(Cryo.None))
 
 		if instance:FindFirstChild(prop) then
 			return false, "Property can't be added. Rename the selected instance."
@@ -25,6 +40,10 @@ return function(instance, prop, root)
 			value = instance[prop]
 		end) then
 			return false, (prop .. " is not a property of " .. instance.Name .. ".")
+		end
+
+		if not isValidProperty(value) then
+			return false, (prop .. " cannot be animated using TweenService.")
 		end
 
 		local tweens = store:getState().Tweens.Tweens

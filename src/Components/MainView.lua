@@ -128,7 +128,7 @@ function MainView:render(props)
 				InstanceStates = self.props.InstanceStates,
 			}),
 			BottomDrawer = editorOpen and polling and Roact.createElement(BottomDrawer, {
-				Header = "Please enter the name of the Property to add to " .. polling.Path .. ".",
+				Header = "Please enter the name of the Property to add to " .. polling.Path .. ":",
 				FocusChanged = self.drawerFocusChanged,
 				Submitted = self.drawerSubmitted,
 			}),
@@ -158,8 +158,10 @@ MainView = RoactRodux.connect(
 				dispatch(DescendantAdded(instance, root, id))
 			end,
 			AddProperty = function(instance, prop, root)
-				print(prop)
-				dispatch(AddProperty(instance, prop, root))
+				local result, err = dispatch(AddProperty(instance, prop, root))
+				if not result and err then
+					warn(err)
+				end
 			end,
 		}
 	end

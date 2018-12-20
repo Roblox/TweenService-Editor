@@ -8,15 +8,63 @@ local Plugin = script.Parent.Parent.Parent
 local Roact = require(Plugin.Roact)
 local Constants = require(Plugin.Src.Util.Constants)
 local withTheme = require(Plugin.Src.Consumers.withTheme)
+local visitDescendants = require(Plugin.Src.Util.visitDescendants)
+local visitChildren = require(Plugin.Src.Util.visitChildren)
+local PathUtils = require(Plugin.Src.Util.PathUtils)
 --local getMouse = require(Plugin.Src.Consumers.getMouse)
 
 local Header = require(Plugin.Src.Components.Header)
 local PropsList = require(Plugin.Src.Components.PropsList)
+local Timeline = require(Plugin.Src.Components.Timeline)
 
 local Editor = Roact.PureComponent:extend("Editor")
 
 function Editor:render()
+	local selection = self.props.Selection and #self.props.Selection == 1 and self.props.Selection[1]
+
 	return withTheme(function(theme)
+		local currentTable = self.props.CurrentTable
+		local currentInstance = self.props.CurrentInstance
+		local instanceStates = self.props.InstanceStates
+
+		local listItems = {}
+
+		if currentTable then
+			visitDescendants(currentInstance, function(instance)
+				if instance == nil then return end
+				local relativePath = PathUtils.RelativePath(currentInstance, instance)
+				local id = instance:GetDebugId()
+				local props = currentTable[relativePath]
+				local state = instanceStates[id]
+				if state then
+					table.insert(listItems, {
+						Type = "Instance",
+						Instance = instance,
+						Path = relativePath,
+						Expanded = state.Expanded,
+						Props = props ~= nil,
+						Children = visitChildren(instance) > 0,
+						Selected = selection == instance,
+					})
+					if state.Expanded then
+						if props then
+							for name in pairs(props) do
+								table.insert(listItems, {
+									Type = "Property",
+									Instance = instance,
+									Path = relativePath,
+									Name = name,
+								})
+							end
+						end
+					end
+					return state.Expanded
+				else
+					return false
+				end
+			end)
+		end
+
 		return Roact.createElement("Frame", {
 			Size = UDim2.new(1, 0, 1, 0),
 			BackgroundTransparency = 1,
@@ -41,10 +89,12 @@ function Editor:render()
 					Padding = UDim.new(0, 3)
 				}),
 				PropsList = Roact.createElement(PropsList, {
-					CurrentTable = self.props.CurrentTable,
 					CurrentInstance = self.props.CurrentInstance,
-					Selection = self.props.Selection,
-					InstanceStates = self.props.InstanceStates,
+					ListItems = listItems,
+				}),
+				Timeline = Roact.createElement(Timeline, {
+					CurrentTable = self.props.CurrentTable,
+					ListItems = listItems,
 				}),
 			}),
 		})

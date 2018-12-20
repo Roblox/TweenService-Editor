@@ -11,20 +11,20 @@ local PathUtils = require(Plugin.Src.Util.PathUtils)
 --local getMouse = require(Plugin.Src.Consumers.getMouse)
 local InstanceItem = require(Plugin.Src.Components.InstanceItem)
 local PropertyItem = require(Plugin.Src.Components.PropertyItem)
-local visitDescendants = require(Plugin.Src.Util.visitDescendants)
-local visitChildren = require(Plugin.Src.Util.visitChildren)
 
 local PropsList = Roact.PureComponent:extend("PropsList")
 
 function PropsList:init()
 	self.iterator = 0
+	self.iterator2 = 0
 	self.listItems = nil
 end
 
 function PropsList:AddPropertyItem(name, path, instance, root)
 	local i = self.iterator
+	local j = self.iterator2
 	self.listItems[instance:GetDebugId() .. " " .. name] = Roact.createElement(PropertyItem, {
-		LighterColor = i % 2 == 0,
+		LighterColor = j % 2 == 0,
 		LayoutOrder = i,
 		Indentation = PathUtils.StepsFromRoot(path) + 1,
 		Property = name,
@@ -32,12 +32,12 @@ function PropsList:AddPropertyItem(name, path, instance, root)
 		Root = root,
 	})
 	self.iterator = i + 1
+	self.iterator2 = j + 1
 end
 
-function PropsList:AddInstanceItem(root, instance, path, selected, expandable, expanded)
+function PropsList:AddInstanceItem(root, instance, path, selected, expandable, expanded, color)
 	local i = self.iterator
 	self.listItems[instance:GetDebugId()] = Roact.createElement(InstanceItem, {
-		LighterColor = i % 2 == 0,
 		LayoutOrder = i,
 		Indentation = PathUtils.StepsFromRoot(path),
 		Instance = instance,
@@ -46,6 +46,7 @@ function PropsList:AddInstanceItem(root, instance, path, selected, expandable, e
 		Expanded = expanded,
 		Expandable = expandable,
 		Selected = selected,
+		Color = not selected and color or nil,
 	})
 	self.iterator = i + 1
 end
@@ -62,13 +63,10 @@ function PropsList:AddSeparator(color)
 end
 
 function PropsList:render()
-	local selection = self.props.Selection and #self.props.Selection == 1 and self.props.Selection[1]
-	local instanceStates = self.props.InstanceStates
-
 	return withTheme(function(theme)
 		self.iterator = 1
+		self.iterator2 = 1
 		self.listItems = nil
-		local currentTable = self.props.CurrentTable
 		local currentInstance = self.props.CurrentInstance
 
 		self.listItems = {
@@ -79,30 +77,16 @@ function PropsList:render()
 			}),
 		}
 
-		if currentTable then
-			visitDescendants(currentInstance, function(instance)
-				if instance == nil then return end
-				local relativePath = PathUtils.RelativePath(currentInstance, instance)
-				local id = instance:GetDebugId()
-				local props = currentTable[relativePath]
-				local state = instanceStates[id]
-				if state then
-					self:AddInstanceItem(currentInstance, instance, relativePath,
-						selection == instance, props ~= nil or visitChildren(instance) > 0, state.Expanded)
-					if state.Expanded then
-						if props then
-							for name in pairs(props) do
-								self:AddPropertyItem(name, relativePath, instance, currentInstance)
-							end
-						end
-					end
-					return state.Expanded
-				else
-					return false
-				end
-			end)
-			self:AddSeparator(theme.header.border)
+		for _, item in pairs(self.props.ListItems) do
+			if item.Type == "Property" then
+				self:AddPropertyItem(item.Name, item.Path, item.Instance, currentInstance)
+			elseif item.Type == "Instance" then
+				self:AddInstanceItem(currentInstance, item.Instance, item.Path, item.Selected,
+					item.Props or item.Children, item.Expanded, theme.listItem.na)
+			end
 		end
+
+		self:AddSeparator(theme.propsList.border)
 
 		return Roact.createElement("Frame", {
 			Size = UDim2.new(0, Constants.PROPS_WIDTH, 1, 0),
