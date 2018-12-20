@@ -8,8 +8,10 @@ local RoactRodux = require(Plugin.RoactRodux)
 local withTheme = require(Plugin.Src.Consumers.withTheme)
 local InstanceSelector = require(Plugin.Src.Components.InstanceSelector)
 local Editor = require(Plugin.Src.Components.Editor)
+local BottomDrawer = require(Plugin.Src.Components.BottomDrawer)
 local Exporting = require(Plugin.Src.Util.Exporting)
 local PathUtils = require(Plugin.Src.Util.PathUtils)
+local AddProperty = require(Plugin.Src.Thunks.AddProperty)
 
 local InitializeEditor = require(Plugin.Src.Thunks.InitializeEditor)
 local DescendantRemoving = require(Plugin.Src.Thunks:WaitForChild'DescendantRemoving')
@@ -57,6 +59,19 @@ function MainView:init()
 		end
 	end
 
+	self.drawerFocusChanged = function(focused)
+		if not focused and self.props.Polling then
+			self.props.AddProperty(nil)
+		end
+	end
+
+	self.drawerSubmitted = function(prop)
+		local polling = self.props.Polling
+		if polling then
+			self.props.AddProperty(polling.Instance, prop, polling.Root)
+		end
+	end
+
 	self.selectionConnection = game.Selection.SelectionChanged:Connect(self.selectionChanged)
 	self.addedConnection = nil
 	self.removedConnection = nil
@@ -89,27 +104,34 @@ local function SelectionDiffers(currentInstance, selection)
 end
 
 function MainView:render(props)
+	local polling = self.props.Polling
 	local currentInstance = self.props.CurrentInstance
 	local selection = self.state.Selection
 	local selectionDiffers, canImport = SelectionDiffers(currentInstance, selection)
+	local editorOpen = currentInstance and not selectionDiffers
 
 	return withTheme(function(theme)
 		return Roact.createElement("Frame", {
 			Size = UDim2.new(1, 0, 1, 0),
 			BackgroundColor3 = theme.backgroundColor,
 		}, {
-			Selector = (not currentInstance or selectionDiffers) and Roact.createElement(InstanceSelector, {
+			Selector = (not editorOpen) and Roact.createElement(InstanceSelector, {
 				Selection = selection,
 				SelectionDiffers = selectionDiffers,
 				CanImport = canImport or self.state.CanAnimate,
 				CreateNew = self.initializeEditor,
 			}),
-			Editor = currentInstance and not selectionDiffers and Roact.createElement(Editor, {
+			Editor = editorOpen and Roact.createElement(Editor, {
 				CurrentTable = self.props.CurrentTable,
 				CurrentInstance = currentInstance,
 				Selection = selection,
 				InstanceStates = self.props.InstanceStates,
-			})
+			}),
+			BottomDrawer = editorOpen and polling and Roact.createElement(BottomDrawer, {
+				Header = "Please enter the name of the Property to add to " .. polling.Path .. ".",
+				FocusChanged = self.drawerFocusChanged,
+				Submitted = self.drawerSubmitted,
+			}),
 		})
 	end)
 end
@@ -121,6 +143,7 @@ MainView = RoactRodux.connect(
 			CurrentInstance = state.Status.CurrentInstance,
 			CurrentTable = state.Tweens.Tweens and state.Tweens.Tweens[state.Tweens.CurrentTween],
 			InstanceStates = state.Status.InstanceStates,
+			Polling = state.Status.Polling,
 		}
 	end,
 	function(dispatch)
@@ -133,6 +156,10 @@ MainView = RoactRodux.connect(
 			end,
 			DescendantAdded = function(instance, root, id)
 				dispatch(DescendantAdded(instance, root, id))
+			end,
+			AddProperty = function(instance, prop, root)
+				print(prop)
+				dispatch(AddProperty(instance, prop, root))
 			end,
 		}
 	end

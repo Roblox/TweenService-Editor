@@ -14,6 +14,7 @@ local SetIsOpen = require(Plugin.Src.Actions.SetIsOpen)
 local SetIsPlaying = require(Plugin.Src.Actions.SetIsPlaying)
 local SetCurrentInstance = require(Plugin.Src.Actions.SetCurrentInstance)
 local SetInstanceStates = require(Plugin.Src.Actions.SetInstanceStates)
+local SetPolling = require(Plugin.Src.Actions.SetPolling)
 local ToggleExpanded = require(Plugin.Src.Actions.ToggleExpanded)
 
 local function Status(state, action)
@@ -22,6 +23,7 @@ local function Status(state, action)
 		IsOpen = false,
 		IsPlaying = false,
 		CurrentInstance = nil,
+		Polling = nil,
 		InstanceStates = {},
 	}
 
@@ -53,6 +55,10 @@ local function Status(state, action)
 					Expanded = not oldValue,
 				})
 			})
+		})
+	elseif action.type == SetPolling.name then
+		return Cryo.Dictionary.join(state, {
+			Polling = action.value,
 		})
 	end
 

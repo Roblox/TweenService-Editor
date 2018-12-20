@@ -83,6 +83,17 @@ function Theme:recalculateTheme()
 			border = color(c.Border),
 		},
 
+		drawer = {
+			background = color(c.RibbonTab),
+			border = color(c.Border),
+		},
+
+		tooltip = {
+			background = isDark and color(c.GameSettingsTooltip) or color(c.RibbonTab, m.Default),
+			border = color(c.Border),
+			text = isDark and color(c.SubText) or color(c.DimmedText),
+		},
+
 		propsList = {
 			background = color(c.MainBackground),
 			border = color(c.Border),
@@ -114,6 +125,15 @@ function Theme:recalculateTheme()
 			TextColor_Disabled = isDark and color(c.DimmedText) or Color3.new(1, 1, 1),
 			BorderColor = color(c.Light),
 		},
+
+		textBox = {
+			background = color(c.InputFieldBackground),
+			disabled = color(c.Tab),
+			borderDefault = color(c.Border),
+			borderHover = isDark and color(c.MainButton) or color(c.CurrentMarker),
+			tooltip = color(c.DimmedText),
+			text = color(c.MainText),
+		},
 --[[
 		hyperlink = color(c.LinkText),
 		warningColor = color(c.WarningText),
@@ -143,15 +163,6 @@ function Theme:recalculateTheme()
 
 		titledFrame = {
 			text = color(c.SubText),
-		},
-
-		textBox = {
-			background = color(c.InputFieldBackground),
-			disabled = color(c.Tab),
-			borderDefault = color(c.Border),
-			borderHover = isDark and color(c.MainButton) or color(c.CurrentMarker),
-			tooltip = color(c.DimmedText),
-			text = color(c.MainText),
 		},
 
 		radioButton = {

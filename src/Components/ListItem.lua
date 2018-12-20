@@ -34,7 +34,8 @@ function ListItem:render()
 			LayoutOrder = self.props.LayoutOrder,
 		}, self.props[Roact.Children] and Cryo.Dictionary.join(self.props[Roact.Children], {
 			UIPadding = Roact.createElement("UIPadding", {
-				PaddingLeft = UDim.new(0, 5 + indentation * 5)
+				PaddingLeft = UDim.new(0, 5 + indentation * 5),
+				PaddingRight = UDim.new(0, 5),
 			})
 		}))
 	end)

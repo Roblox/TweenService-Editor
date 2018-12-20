@@ -7,7 +7,7 @@
 		table Buttons = The buttons to add to this button bar.
 ]]
 
-local BUTTON_BAR_PADDING = 25
+local BUTTON_BAR_PADDING = 15
 local BUTTON_BAR_EDGE_PADDING = 35
 
 local Plugin = script.Parent.Parent.Parent
@@ -56,7 +56,7 @@ local function ButtonBar(props)
 
 		return Roact.createElement("Frame", {
 			LayoutOrder = props.LayoutOrder or 1,
-			Size = UDim2.new(1, 0, 0, Constants.BUTTON_HEIGHT),
+			Size = UDim2.new(props.Width or 1, 0, 0, Constants.BUTTON_HEIGHT),
 			AnchorPoint = props.AnchorPoint or Vector2.new(0, 0.5),
 			Position = props.Position or UDim2.new(0, 0, 0.5, 0),
 			BackgroundTransparency = 1,

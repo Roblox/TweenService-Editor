@@ -21,14 +21,15 @@ function PropsList:init()
 	self.listItems = nil
 end
 
-function PropsList:AddPropertyItem(name, path, parent)
+function PropsList:AddPropertyItem(name, path, instance, root)
 	local i = self.iterator
-	self.listItems[parent:GetDebugId() .. " " .. name] = Roact.createElement(PropertyItem, {
+	self.listItems[instance:GetDebugId() .. " " .. name] = Roact.createElement(PropertyItem, {
 		LighterColor = i % 2 == 0,
 		LayoutOrder = i,
 		Indentation = PathUtils.StepsFromRoot(path) + 1,
 		Property = name,
-		Path = path,
+		Instance = instance,
+		Root = root,
 	})
 	self.iterator = i + 1
 end
@@ -91,7 +92,7 @@ function PropsList:render()
 					if state.Expanded then
 						if props then
 							for name in pairs(props) do
-								self:AddPropertyItem(name, relativePath, instance)
+								self:AddPropertyItem(name, relativePath, instance, currentInstance)
 							end
 						end
 					end
