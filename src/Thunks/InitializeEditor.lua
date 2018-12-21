@@ -22,8 +22,8 @@ return function(instance)
 
 		local tweens, firstTag
 		if #animator.Tweens:GetChildren() == 0 then
-			tweens = {Default = {}}
-			firstTag = "Default"
+			tweens = {NewTween = {}}
+			firstTag = "NewTween"
 		else
 			tweens, firstTag = Exporting.GetTweensForAnimator(animator)
 		end

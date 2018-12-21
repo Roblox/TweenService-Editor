@@ -64,9 +64,9 @@ end
 function Exporting.TagAnimatorWithKey(animator, key)
 	local tags = CollectionService:GetTags(animator.Tweens)
 	for _, tag in pairs(tags) do
-		CollectionService:RemoveTag(animator, tag)
+		CollectionService:RemoveTag(animator.Tweens, tag)
 	end
-	CollectionService:AddTag(animator, key)
+	CollectionService:AddTag(animator.Tweens, key)
 end
 
 function Exporting.ExportTween(tweenInfo, name, parent)
