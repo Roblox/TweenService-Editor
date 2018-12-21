@@ -68,7 +68,25 @@ function Header:render()
 				LayoutOrder = 4,
 				SelectEntry = self.props.SetCurrentTween,
 				CreateTween = self.props.CreateTween,
-			})
+			}),
+			Rename = Roact.createElement(HeaderButton, {
+				Width = 80,
+				Text = "Rename",
+				Tooltip = "Rename the current tween.",
+				LayoutOrder = 5,
+				OnClick = function()
+					self.props.ButtonPressed("Rename")
+				end,
+			}),
+			Delete = Roact.createElement(HeaderButton, {
+				Width = 80,
+				Text = "Delete",
+				Tooltip = "Delete the current tween.",
+				LayoutOrder = 6,
+				OnClick = function()
+					self.props.ButtonPressed("Delete")
+				end,
+			}),
 		})
 	end)
 end

@@ -82,4 +82,11 @@ function Exporting.SaveAll(root, tweens)
 	end
 end
 
+function Exporting.DeleteAll(root)
+	local animator = Exporting.GetAnimator(root)
+	if animator then
+		animator:Destroy()
+	end
+end
+
 return Exporting

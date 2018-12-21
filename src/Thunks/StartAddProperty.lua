@@ -10,6 +10,7 @@ return function(instance, root)
 	return function(store)
 		local path = PathUtils.RelativePath(root, instance)
 		store:dispatch(SetPolling({
+			Value = "Property",
 			Path = path,
 			Instance = instance,
 			Root = root,

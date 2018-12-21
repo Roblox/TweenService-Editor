@@ -28,7 +28,7 @@ end
 function BottomDrawer:render()
 	return withTheme(function(theme)
 		local buttons = {
-			{Default = true, Name = "Add", Value = true, Active = true},
+			{Default = true, Name = self.props.ButtonName, Value = true, Active = true},
 		}
 
 		return Roact.createElement("Frame", {

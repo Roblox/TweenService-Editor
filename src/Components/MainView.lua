@@ -13,6 +13,9 @@ local Exporting = require(Plugin.Src.Util.Exporting)
 local PathUtils = require(Plugin.Src.Util.PathUtils)
 local AddProperty = require(Plugin.Src.Thunks.AddProperty)
 local SaveAll = require(Plugin.Src.Thunks.SaveAll)
+local SetTweenName = require(Plugin.Src.Thunks.SetTweenName)
+local StartRenameTween = require(Plugin.Src.Thunks.StartRenameTween)
+local DeleteTween = require(Plugin.Src.Thunks.DeleteTween)
 
 local InitializeEditor = require(Plugin.Src.Thunks.InitializeEditor)
 local DescendantRemoving = require(Plugin.Src.Thunks:WaitForChild'DescendantRemoving')
@@ -66,10 +69,12 @@ function MainView:init()
 		end
 	end
 
-	self.drawerSubmitted = function(prop)
+	self.drawerSubmitted = function(val)
 		local polling = self.props.Polling
-		if polling then
-			self.props.AddProperty(polling.Instance, prop, polling.Root)
+		if polling.Value == "Property" then
+			self.props.AddProperty(polling.Instance, val, polling.Root)
+		elseif polling.Value == "Name" then
+			self.props.SetTweenName(val)
 		end
 	end
 
@@ -80,6 +85,10 @@ function MainView:init()
 			if self.props.CurrentInstance then
 				self.props.InitializeEditor(self.props.CurrentInstance)
 			end
+		elseif button == "Rename" then
+			self.props.StartRenameTween()
+		elseif button == "Delete" then
+			self.props.DeleteTween()
 		end
 	end
 
@@ -139,10 +148,17 @@ function MainView:render(props)
 				InstanceStates = self.props.InstanceStates,
 				HeaderButtonPressed = self.headerButtonPressed,
 			}),
-			BottomDrawer = editorOpen and polling and Roact.createElement(BottomDrawer, {
+			PollProperty = editorOpen and polling and polling.Value == "Property" and Roact.createElement(BottomDrawer, {
 				Header = "Please enter the name of the Property to add to " .. polling.Path .. ":",
 				FocusChanged = self.drawerFocusChanged,
 				Submitted = self.drawerSubmitted,
+				ButtonName = "Add",
+			}),
+			PollName = editorOpen and polling and polling.Value == "Name" and Roact.createElement(BottomDrawer, {
+				Header = "Please enter the name of the new name for " .. polling.Tween .. ":",
+				FocusChanged = self.drawerFocusChanged,
+				Submitted = self.drawerSubmitted,
+				ButtonName = "Rename",
 			}),
 		})
 	end)
@@ -174,6 +190,15 @@ MainView = RoactRodux.connect(
 				if not result and err then
 					warn(err)
 				end
+			end,
+			SetTweenName = function(newName)
+				dispatch(SetTweenName(newName))
+			end,
+			StartRenameTween = function()
+				dispatch(StartRenameTween())
+			end,
+			DeleteTween = function()
+				dispatch(DeleteTween())
 			end,
 			SaveAll = function()
 				dispatch(SaveAll())

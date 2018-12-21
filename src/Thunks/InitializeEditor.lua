@@ -50,6 +50,10 @@ return function(instance)
 			})
 		end)
 
+		if #animator.Tweens:GetChildren() == 0 then
+			Exporting.SaveAll(instance, tweens)
+		end
+
 		store:dispatch(SetInstanceStates(instanceStates))
 		store:dispatch(SelectKeyframe(nil))
 		store:dispatch(SetPlayhead(0))

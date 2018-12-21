@@ -47,6 +47,10 @@ function HeaderDropdown:render()
 		local selectedEntry = self.props.SelectedEntry
 		local open = self.state.Open
 
+		if entries then
+			table.sort(entries)
+		end
+
 		local buttons = {
 			Layout = Roact.createElement("UIListLayout", {
 				SortOrder = Enum.SortOrder.LayoutOrder,
@@ -102,7 +106,7 @@ function HeaderDropdown:render()
 				[Roact.Event.InputBegan] = self.inputBegan,
 			}),
 			Dropdown = open and Roact.createElement("Frame", {
-				Size = UDim2.new(0, self.props.Width, 0, (Constants.HEADER_HEIGHT - 4) * #entries),
+				Size = UDim2.new(0, self.props.Width, 0, (Constants.HEADER_HEIGHT - 4) * (#entries + 1)),
 				Position = UDim2.new(0, 0, 0, Constants.HEADER_HEIGHT - 4),
 				BackgroundColor3 = theme.headerButton.background,
 				BorderColor3 = theme.headerButton.border,
