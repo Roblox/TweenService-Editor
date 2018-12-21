@@ -19,6 +19,7 @@ local ToggleExpanded = require(Plugin.Src.Actions.ToggleExpanded)
 local SetSelectedKeyframe = require(Plugin.Src.Actions.SetSelectedKeyframe)
 local SetPlayhead = require(Plugin.Src.Actions.SetPlayhead)
 local SetDirty = require(Plugin.Src.Actions.SetDirty)
+local SetClipboard = require(Plugin.Src.Actions.SetClipboard)
 local SetTweens = require(Plugin.Src.Actions.SetTweens)
 
 local function Status(state, action)
@@ -31,6 +32,7 @@ local function Status(state, action)
 		InstanceStates = {},
 		SelectedKeyframe = nil,
 		Playhead = 0,
+		Clipboard = nil,
 		Dirty = false,
 	}
 
@@ -88,6 +90,10 @@ local function Status(state, action)
 	elseif action.type == SetTweens.name then
 		return Cryo.Dictionary.join(state, {
 			Dirty = true,
+		})
+	elseif action.type == SetClipboard.name then
+		return Cryo.Dictionary.join(state, {
+			Clipboard = action.value,
 		})
 	end
 

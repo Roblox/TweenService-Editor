@@ -32,6 +32,12 @@ local function makePluginActions()
 		DeleteKeyframe = plugin:CreatePluginAction("TweenSequenceEditor_DeleteKeyframe",
 			"Delete Keyframe",
 			"Delete the currently selected keyframe in the TweenSequence Editor."),
+		CopyKeyframe = plugin:CreatePluginAction("TweenSequenceEditor_CopyKeyframe",
+			"Copy Keyframe",
+			"Copy the currently selected keyframe in the TweenSequence Editor."),
+		PasteKeyframe = plugin:CreatePluginAction("TweenSequenceEditor_PasteKeyframe",
+			"Paste Keyframe",
+			"Paste a keyframe at the playhead in the TweenSequence Editor."),
 	}
 	return actions
 end

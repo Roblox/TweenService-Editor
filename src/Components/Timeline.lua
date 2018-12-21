@@ -15,6 +15,8 @@ local TimelineScale = require(Plugin.Src.Components.TimelineScale)
 local SelectKeyframe = require(Plugin.Src.Thunks.SelectKeyframe)
 local DeleteSelectedKeyframe = require(Plugin.Src.Thunks.DeleteSelectedKeyframe)
 local MoveKeyframe = require(Plugin.Src.Thunks.MoveKeyframe)
+local CopyKeyframe = require(Plugin.Src.Thunks.CopyKeyframe)
+local PasteKeyframe = require(Plugin.Src.Thunks.PasteKeyframe)
 local SetPlayhead = require(Plugin.Src.Actions.SetPlayhead)
 local Keyframe = require(Plugin.Src.Components.Keyframe)
 local clamp = require(Plugin.Src.Util.clamp)
@@ -74,12 +76,19 @@ function Timeline:init()
 	self.deleteConnection = getActions(self).DeleteKeyframe.Triggered:Connect(function()
 		self.props.DeleteSelectedKeyframe()
 	end)
+	self.copyConnection = getActions(self).CopyKeyframe.Triggered:Connect(function()
+		self.props.CopyKeyframe()
+	end)
+	self.pasteConnection = getActions(self).PasteKeyframe.Triggered:Connect(function()
+		self.props.PasteKeyframe()
+	end)
 end
 
 function Timeline:willUnmount()
 	if self.deleteConnection then
 		self.deleteConnection:Disconnect()
 	end
+	self.props.SetPlayhead(0)
 end
 
 function Timeline:MakeKeyframe(kf, item, scale, start, index, time)
@@ -226,6 +235,12 @@ Timeline = RoactRodux.connect(
 			end,
 			DeleteSelectedKeyframe = function()
 				dispatch(DeleteSelectedKeyframe())
+			end,
+			CopyKeyframe = function()
+				dispatch(CopyKeyframe())
+			end,
+			PasteKeyframe = function()
+				dispatch(PasteKeyframe())
 			end,
 			MoveKeyframe = function(path, prop, index, newTime)
 				dispatch(MoveKeyframe(path, prop, index, newTime))
