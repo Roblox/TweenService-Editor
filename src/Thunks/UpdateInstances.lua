@@ -59,6 +59,10 @@ return function()
 		local currentInstance = state.Status.CurrentInstance
 		local time = state.Status.Playhead
 
+		if tweens == nil or currentInstance == nil then
+			return
+		end
+
 		VisitAllInstances(currentInstance, tweenTable, function(instance, props)
 			for name, values in pairs(props) do
 				if time == 0 then
@@ -79,7 +83,7 @@ return function()
 							lastTime = keyframe.Time
 						end
 					end
-					if lastTime == 0 then
+					if lastTime == 0 and #values.Keyframes > 0 then
 						local alpha = (time - lastTime) / (values.Keyframes[1].Time - lastTime)
 						instance[name] = Lerp(lastValue, values.Keyframes[1].Value, alpha)
 					end

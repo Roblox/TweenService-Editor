@@ -21,17 +21,27 @@ return function()
 		local index = selectedKeyframe.Index
 
 		if tweenTable[path] and tweenTable[path][prop] then
-			local oldKeyframes = tweenTable[path][prop].Keyframes
-			local kf = oldKeyframes[index]
-
-			if kf then
+			if index == 0 then
 				store:dispatch(SetClipboard({
-					Value = kf.Value,
-					EasingDirection = kf.EasingDirection,
-					EasingStyle = kf.EasingStyle,
+					Value = tweenTable[path][prop].InitialValue,
+					EasingDirection = Enum.EasingDirection.Out,
+					EasingStyle = Enum.EasingStyle.Linear,
 					Path = path,
 					Prop = prop,
 				}))
+			else
+				local oldKeyframes = tweenTable[path][prop].Keyframes
+				local kf = oldKeyframes[index]
+
+				if kf then
+					store:dispatch(SetClipboard({
+						Value = kf.Value,
+						EasingDirection = kf.EasingDirection,
+						EasingStyle = kf.EasingStyle,
+						Path = path,
+						Prop = prop,
+					}))
+				end
 			end
 		end
 	end

@@ -11,6 +11,8 @@ local Roact = require(Plugin.Roact)
 local withTheme = require(Plugin.Src.Consumers.withTheme)
 local ButtonBar = require(Plugin.Src.Components.ButtonBar)
 
+local ICON = "rbxassetid://2658642540"
+
 local InstanceSelector = Roact.PureComponent:extend("InstanceSelector")
 
 function InstanceSelector:render(props)
@@ -23,7 +25,7 @@ function InstanceSelector:render(props)
 		text = "Please select only one instance."
 	elseif #selection == 1 then
 		canSelect = true
-		text = selection[1]:GetFullName()
+		text = "Root: " .. selection[1]:GetFullName()
 	else
 		text = "Select an instance to begin animating."
 	end
@@ -51,9 +53,30 @@ function InstanceSelector:render(props)
 			Position = UDim2.new(0.5, 0, 0.5, 0),
 			BackgroundTransparency = 1,
 		}, {
+			Layout = Roact.createElement("UIListLayout", {
+				SortOrder = Enum.SortOrder.LayoutOrder,
+				FillDirection = Enum.FillDirection.Vertical,
+				HorizontalAlignment = Enum.HorizontalAlignment.Center,
+				VerticalAlignment = Enum.VerticalAlignment.Center,
+				Padding = UDim.new(0, 25),
+			}),
 			Padding = Roact.createElement("UIPadding", {
 				PaddingBottom = UDim.new(0, 30),
 				PaddingTop = UDim.new(0, 30),
+			}),
+			Image = Roact.createElement("ImageLabel", {
+				BackgroundTransparency = 1,
+				Image = ICON,
+				Size = UDim2.new(0, 80, 0, 80),
+				LayoutOrder = 1,
+			}),
+			Prompt = Roact.createElement("TextLabel", {
+				BackgroundTransparency = 1,
+				Text = "TweenSequence Editor",
+				Font = Enum.Font.Gotham,
+				TextSize = 28,
+				TextColor3 = theme.mainText,
+				LayoutOrder = 2,
 			}),
 			InstanceName = Roact.createElement("TextLabel", {
 				BackgroundTransparency = 1,
@@ -61,16 +84,13 @@ function InstanceSelector:render(props)
 				Font = Enum.Font.Gotham,
 				TextSize = 16,
 				TextColor3 = theme.mainText,
-				Size = UDim2.new(1, 0, 0.5, 0),
-				AnchorPoint = Vector2.new(0, 0.5),
-				Position = UDim2.new(0, 0, 0.5, 0),
+				LayoutOrder = 3,
 			}),
 			Buttons = Roact.createElement(ButtonBar, {
 				HorizontalAlignment = Enum.HorizontalAlignment.Center,
 				Buttons = buttons,
 				ButtonClicked = self.props.CreateNew,
-				AnchorPoint = Vector2.new(0.5, 1),
-				Position = UDim2.new(0.5, 0, 1, 0),
+				LayoutOrder = 4,
 			}),
 		})
 	end)

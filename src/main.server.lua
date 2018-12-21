@@ -5,6 +5,8 @@ local DOCK_WIDGET_INFO = DockWidgetPluginGuiInfo.new(
 )
 local LOG_STORE_STATE_AND_EVENTS = false
 
+local RunService = game:GetService("RunService")
+
 local Plugin = script.Parent.Parent
 local Roact = require(Plugin.Roact)
 local Rodux = require(Plugin.Rodux)
@@ -104,8 +106,12 @@ local function main()
 		mainStore:dispatch(SetHasFocus(false))
 	end)
 
-	mainButton.Enabled = true
-	mainButton.Click:connect(toggleView)
+	if RunService:IsEdit() then
+		mainButton.Enabled = true
+		mainButton.Click:connect(toggleView)
+	else
+		mainButton.Enabled = false
+	end
 
 	if pluginGui.Enabled then
 		openTweenEditor()
