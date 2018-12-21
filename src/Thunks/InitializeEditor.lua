@@ -43,7 +43,6 @@ return function(instance)
 				[descendant:GetDebugId()] = {
 					Expanded = true,
 					Name = descendant.Name,
-					SubscribedProps = {},
 				}
 			})
 		end)

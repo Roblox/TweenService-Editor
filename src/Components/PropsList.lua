@@ -75,6 +75,12 @@ function PropsList:render()
 				FillDirection = Enum.FillDirection.Vertical,
 				VerticalAlignment = Enum.VerticalAlignment.Top,
 			}),
+			Padding = Roact.createElement("Frame", {
+				Size = UDim2.new(1, 0, 0, 30),
+				BackgroundColor3 = theme.timeline.background,
+				BorderSizePixel = 0,
+				LayoutOrder = 0,
+			}),
 		}
 
 		for _, item in pairs(self.props.ListItems) do

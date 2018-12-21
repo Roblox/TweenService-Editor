@@ -16,6 +16,7 @@ local SetIsOpen = require(Plugin.Src.Actions.SetIsOpen)
 
 local pluginGui
 local tweenEditorHandle
+local pluginActions
 
 local middlewares = {Rodux.thunkMiddleware}
 if LOG_STORE_STATE_AND_EVENTS then
@@ -23,6 +24,15 @@ if LOG_STORE_STATE_AND_EVENTS then
 end
 
 local mainStore = Rodux.Store.new(MainReducer, nil, middlewares)
+
+local function makePluginActions()
+	local actions = {
+		DeleteKeyframe = plugin:CreatePluginAction("TweenSequenceEditor_DeleteKeyframe",
+			"Delete Keyframe",
+			"Delete the currently selected keyframe in the TweenSequence Editor."),
+	}
+	return actions
+end
 
 local function closeTweenEditor()
 	mainStore:dispatch(SetIsOpen(false))
@@ -36,7 +46,8 @@ local function openTweenEditor()
 	local servicesProvider = Roact.createElement(ExternalServicesWrapper, {
 		store = mainStore,
 		theme = Theme.new(),
-		mouse = plugin:GetMouse()
+		mouse = plugin:GetMouse(),
+		actions = pluginActions,
 	}, {
 		mainView = Roact.createElement(MainView),
 	})
@@ -57,6 +68,7 @@ local function toggleView()
 end
 
 local function main()
+	pluginActions = makePluginActions()
 	pluginGui = plugin:CreateDockWidgetPluginGui("TweenSequenceEditor", DOCK_WIDGET_INFO)
 	pluginGui.Title = "TweenSequence Editor"
 	pluginGui.Name = "TweenSequenceEditor"

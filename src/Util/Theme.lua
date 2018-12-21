@@ -75,8 +75,12 @@ function Theme:recalculateTheme()
 	self:update({
 		isDarkerTheme = isDark,
 
+		playhead = Constants.BLUE,
+		white = Color3.new(1, 1, 1),
+
 		backgroundColor = color(c.MainBackground),
 		mainText = color(c.MainText),
+		dimmedText = color(c.DimmedText),
 
 		header = {
 			background = color(c.MainBackground),
@@ -99,6 +103,15 @@ function Theme:recalculateTheme()
 			border = color(c.Border),
 		},
 
+		keyframe = {
+			background = color(c.Light),
+			border = color(c.Dark),
+			selected = {
+				background = color(c.CurrentMarker),
+				border = color(c.Button, m.Selected),
+			},
+		},
+
 		listItem = {
 			text = color(c.MainText),
 			brightText = color(c.BrightText),
@@ -107,6 +120,12 @@ function Theme:recalculateTheme()
 			na = color(c.MainBackground),
 			selected = color(c.Item, m.Selected),
 			selectedText = isDark and color(c.BrightText) or Color3.new(1, 1, 1),
+		},
+
+		timeline = {
+			background = color(c.RibbonButton, m.Hover),
+			tick = isDark and color(c.Light) or color(c.RibbonButton, m.Hover),
+			mainTick = color(c.Dark),
 		},
 
 		cancelButton = {

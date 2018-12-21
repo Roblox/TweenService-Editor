@@ -17,7 +17,7 @@ local ListItem = Roact.PureComponent:extend("ListItem")
 function ListItem:render()
 	local light = self.props.LighterColor
 	local color = self.props.Color
-	local indentation = self.props.Indentation or 0
+	local indentation = self.props.Indentation
 	local selected = self.props.Selected
 
 	return withTheme(function(theme)
@@ -36,7 +36,7 @@ function ListItem:render()
 			LayoutOrder = self.props.LayoutOrder,
 			ZIndex = color == nil and 2 or 1,
 		}, self.props[Roact.Children] and Cryo.Dictionary.join(self.props[Roact.Children], {
-			UIPadding = Roact.createElement("UIPadding", {
+			UIPadding = indentation and Roact.createElement("UIPadding", {
 				PaddingLeft = UDim.new(0, 5 + indentation * 5),
 				PaddingRight = UDim.new(0, 5),
 			})

@@ -44,16 +44,19 @@ local function BuildTweens(root, tweenTable)
 	VisitAllInstances(root, tweenTable, function(instance, props)
 		for prop, values in pairs(props) do
 			local keyframes = values.Keyframes
+			local lastTime = 0
 			for _, keyframe in ipairs(keyframes) do
-				local tweenInfo = TweenInfo.new(keyframe.Time, keyframe.EasingStyle, keyframe.EasingDirection, 0, false, 0)
+				local tweenInfo = TweenInfo.new(keyframe.Time - lastTime,
+					keyframe.EasingStyle,keyframe.EasingDirection, 0, false, 0)
 				local propTable = {
 					[prop] = keyframe.Value
 				}
 				local tween = TweenService:Create(instance, tweenInfo, propTable)
 				table.insert(tweens, {
 					Tween = tween,
-					DelayTime = keyframe.DelayTime,
+					DelayTime = lastTime,
 				})
+				lastTime = keyframe.Time
 			end
 		end
 	end)

@@ -19,8 +19,28 @@ local Timeline = require(Plugin.Src.Components.Timeline)
 
 local Editor = Roact.PureComponent:extend("Editor")
 
+function Editor:init()
+	self.state = {
+		Width = 0,
+	}
+	self.frameRef = Roact.createRef()
+
+	self.sizeChanged = function(rbx)
+		self:setState({
+			Width = self.frameRef.current.AbsoluteSize.X
+		})
+	end
+end
+
+function Editor:didMount()
+	self:setState({
+		Width = self.frameRef.current.AbsoluteSize.X
+	})
+end
+
 function Editor:render()
 	local selection = self.props.Selection and #self.props.Selection == 1 and self.props.Selection[1]
+	local width = self.state.Width
 
 	return withTheme(function(theme)
 		local currentTable = self.props.CurrentTable
@@ -53,6 +73,7 @@ function Editor:render()
 									Type = "Property",
 									Instance = instance,
 									Path = relativePath,
+									Values = props[name],
 									Name = name,
 								})
 							end
@@ -80,7 +101,10 @@ function Editor:render()
 				BackgroundColor3 = theme.backgroundColor,
 				BorderColor3 = theme.header.border,
 				BorderSizePixel = 1,
-				Size = UDim2.new(1, 0, 1, -Constants.HEADER_HEIGHT)
+				Size = UDim2.new(1, 0, 1, -Constants.HEADER_HEIGHT),
+
+				[Roact.Change.AbsoluteSize] = self.sizeChanged,
+				[Roact.Ref] = self.frameRef,
 			}, {
 				Layout = Roact.createElement("UIListLayout", {
 					SortOrder = Enum.SortOrder.LayoutOrder,
@@ -94,6 +118,7 @@ function Editor:render()
 				}),
 				Timeline = Roact.createElement(Timeline, {
 					CurrentTable = self.props.CurrentTable,
+					Width = width,
 					ListItems = listItems,
 				}),
 			}),

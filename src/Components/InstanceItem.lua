@@ -16,6 +16,7 @@ local PathUtils = require(Plugin.Src.Util.PathUtils)
 local InstanceChanged = require(Plugin.Src.Thunks.InstanceChanged)
 local ToggleExpanded = require(Plugin.Src.Actions.ToggleExpanded)
 local StartAddProperty = require(Plugin.Src.Thunks.StartAddProperty)
+local WatchedPropChanged = require(Plugin.Src.Thunks.WatchedPropChanged)
 
 local ListItem = require(Plugin.Src.Components.ListItem)
 local IconButton = require(Plugin.Src.Components.IconButton)
@@ -32,6 +33,8 @@ function InstanceItem:init(initialProps)
 			local newPath = PathUtils.RelativePath(root, instance)
 			newPath = self.props.InstanceChanged(self.oldPath, newPath, instance, root)
 			self.oldPath = newPath
+		else
+			self.props.WatchedPropChanged(self.oldPath, prop, self.props.Instance)
 		end
 	end
 
@@ -145,6 +148,9 @@ InstanceItem = RoactRodux.connect(
 			end,
 			StartAddProperty = function(instance, root)
 				dispatch(StartAddProperty(instance, root))
+			end,
+			WatchedPropChanged = function(path, prop, instance)
+				dispatch(WatchedPropChanged(path, prop, instance))
 			end,
 		}
 	end

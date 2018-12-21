@@ -69,11 +69,17 @@ function Exporting.TagAnimatorWithKey(animator, key)
 	CollectionService:AddTag(animator, key)
 end
 
-function Exporting.ExportTween(instance, tweenInfo, name)
-	local animator = Exporting.ExportAnimator(instance)
-	local tweens = animator.Tweens
+function Exporting.ExportTween(tweenInfo, name, parent)
 	local tween = WriteTween(tweenInfo, name)
-	tween.Parent = tweens
+	tween.Parent = parent
+end
+
+function Exporting.SaveAll(root, tweens)
+	local animator = Exporting.ExportAnimator(root)
+	animator.Tweens:ClearAllChildren()
+	for name, tween in pairs(tweens) do
+		Exporting.ExportTween(tween, name, animator.Tweens)
+	end
 end
 
 return Exporting

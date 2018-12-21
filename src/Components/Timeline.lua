@@ -7,9 +7,18 @@
 
 local Plugin = script.Parent.Parent.Parent
 local Roact = require(Plugin.Roact)
+local RoactRodux = require(Plugin.RoactRodux)
 local withTheme = require(Plugin.Src.Consumers.withTheme)
 --local getMouse = require(Plugin.Src.Consumers.getMouse)
 local ListItem = require(Plugin.Src.Components.ListItem)
+local TimelineScale = require(Plugin.Src.Components.TimelineScale)
+local SelectKeyframe = require(Plugin.Src.Thunks.SelectKeyframe)
+local DeleteSelectedKeyframe = require(Plugin.Src.Thunks.DeleteSelectedKeyframe)
+local MoveKeyframe = require(Plugin.Src.Thunks.MoveKeyframe)
+local SetPlayhead = require(Plugin.Src.Actions.SetPlayhead)
+local Keyframe = require(Plugin.Src.Components.Keyframe)
+local clamp = require(Plugin.Src.Util.clamp)
+local getActions = require(Plugin.Src.Consumers.getActions)
 
 local Timeline = Roact.PureComponent:extend("Timeline")
 
@@ -17,15 +26,85 @@ function Timeline:init()
 	self.iterator = 0
 	self.iterator2 = 0
 	self.listItems = nil
+	self.state = {
+		Scale = 50,
+		Start = 0,
+		PlayheadDrag = nil,
+	}
+
+	self.dragPlayhead = function(time, doneDragging)
+		if doneDragging then
+			self.props.SetPlayhead(time)
+			wait()
+			self:setState({
+				PlayheadDrag = Roact.None,
+			})
+		else
+			self:setState({
+				PlayheadDrag = time,
+			})
+		end
+	end
+
+	self.inputChanged = function(rbx, input)
+		if input.UserInputType == Enum.UserInputType.MouseWheel then
+			local scale = self.state.Scale
+			local newScale = clamp(scale + input.Position.Z * 2, 20, 200)
+			self:setState({
+				Scale = newScale
+			})
+		end
+	end
+
+	self.deleteConnection = getActions(self).DeleteKeyframe.Triggered:Connect(function()
+		self.props.DeleteSelectedKeyframe()
+	end)
 end
 
-function Timeline:AddPropertyItem(instance, name)
+function Timeline:willUnmount()
+	if self.deleteConnection then
+		self.deleteConnection:Disconnect()
+	end
+end
+
+function Timeline:MakeKeyframe(kf, item, scale, start, index, time)
+	local selected = false
+	if kf then
+		if kf.Path == item.Path and kf.Prop == item.Name and kf.Index == index then
+			selected = true
+		end
+	end
+	return Roact.createElement(Keyframe, {
+		Scale = scale,
+		Time = time,
+		Start = start,
+		Selected = selected,
+		OnClick = function()
+			self.props.SelectKeyframe(item.Path, item.Name, index)
+		end,
+		OnDragEnded = function(newTime)
+			self.props.MoveKeyframe(item.Path, item.Name, index, newTime)
+		end
+	})
+end
+
+function Timeline:AddPropertyItem(item)
 	local i = self.iterator
 	local j = self.iterator2
-	self.listItems[instance:GetDebugId() .. " " .. name] = Roact.createElement(ListItem, {
+	local kf = self.props.SelectedKeyframe
+
+	local keyframes = {}
+	table.insert(keyframes, self:MakeKeyframe(kf, item,
+		self.state.Scale, self.state.Start, 0, 0))
+	for i, keyframe in ipairs(item.Values.Keyframes) do
+		table.insert(keyframes, self:MakeKeyframe(kf, item,
+			self.state.Scale, self.state.Start, i, keyframe.Time))
+	end
+
+	self.listItems[item.Instance:GetDebugId() .. " " .. item.Name] = Roact.createElement(ListItem, {
 		LighterColor = j % 2 == 0,
 		LayoutOrder = i,
-	})
+	}, keyframes)
 	self.iterator = i + 1
 	self.iterator2 = j + 1
 end
@@ -56,6 +135,8 @@ function Timeline:render()
 		self.iterator = 1
 		self.iterator2 = 1
 		self.listItems = nil
+		local scale = self.state.Scale
+		local start = self.state.Start
 
 		self.listItems = {
 			Layout = Roact.createElement("UIListLayout", {
@@ -63,11 +144,17 @@ function Timeline:render()
 				FillDirection = Enum.FillDirection.Vertical,
 				VerticalAlignment = Enum.VerticalAlignment.Top,
 			}),
+			Topbar = Roact.createElement("Frame", {
+				Size = UDim2.new(1, 0, 0, 30),
+				BackgroundColor3 = theme.timeline.background,
+				BorderSizePixel = 0,
+				LayoutOrder = 0,
+			}),
 		}
 
 		for _, item in pairs(self.props.ListItems) do
 			if item.Type == "Property" then
-				self:AddPropertyItem(item.Instance, item.Name)
+				self:AddPropertyItem(item)
 			elseif item.Type == "Instance" then
 				self:AddInstanceItem(item.Instance, item.Selected, theme.listItem.na)
 			end
@@ -80,8 +167,49 @@ function Timeline:render()
 			BackgroundTransparency = 0,
 			BackgroundColor3 = theme.listItem.na,
 			LayoutOrder = 2,
-		}, self.listItems)
+
+			[Roact.Event.InputChanged] = self.inputChanged,
+		}, {
+			Scale = Roact.createElement(TimelineScale, {
+				Scale = scale,
+				Start = start,
+				Width = self.props.Width,
+				Playhead = self.state.PlayheadDrag or self.props.Playhead,
+				OnDrag = self.dragPlayhead,
+			}),
+			List = Roact.createElement("Frame", {
+				BackgroundTransparency = 1,
+				Size = UDim2.new(1, 0, 1, 0)
+			}, self.listItems)
+		})
 	end)
 end
+
+Timeline = RoactRodux.connect(
+	function(state, props)
+		if not state then return end
+		return {
+			Playhead = state.Status.Playhead,
+			SelectedKeyframe = state.Status.SelectedKeyframe,
+		}
+	end,
+	function(dispatch)
+		return {
+			SelectKeyframe = function(path, prop, time)
+				dispatch(SelectKeyframe(path, prop, time))
+			end,
+			SetPlayhead = function(playhead)
+				dispatch(SetPlayhead(playhead))
+				dispatch(SelectKeyframe(nil))
+			end,
+			DeleteSelectedKeyframe = function()
+				dispatch(DeleteSelectedKeyframe())
+			end,
+			MoveKeyframe = function(path, prop, index, newTime)
+				dispatch(MoveKeyframe(path, prop, index, newTime))
+			end,
+		}
+	end
+)(Timeline)
 
 return Timeline

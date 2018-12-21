@@ -9,11 +9,14 @@ BUTTON_HEIGHT = 35,
 
 PROPS_WIDTH = 250,
 
-HEADER_HEIGHT = 25,
+TIMELINE_PADDING = 15,
+
+HEADER_HEIGHT = 26,
 ITEM_HEIGHT = 25,
 ITEM_TEXT_SIZE = 15,
 
 BLUE_DISABLED = Color3.fromRGB(153, 218, 255),
+BLUE = Color3.fromRGB(0, 162, 255),
 
 ROUNDED_BACKGROUND_IMAGE = "rbxasset://textures/StudioToolbox/RoundedBackground.png",
 ROUNDED_BORDER_IMAGE = "rbxasset://textures/StudioToolbox/RoundedBorder.png",

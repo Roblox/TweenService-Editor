@@ -7,6 +7,7 @@ local Roact = require(Plugin.Roact)
 local RoactRodux = require(Plugin.RoactRodux)
 
 local ThemeProvider = require(Plugin.Src.Providers.ThemeProvider)
+local ActionProvider = require(Plugin.Src.Providers.ActionProvider)
 
 local function ExternalServicesWrapper(props)
 	return Roact.createElement(RoactRodux.StoreProvider, {
@@ -14,7 +15,11 @@ local function ExternalServicesWrapper(props)
 	}, {
 		Roact.createElement(ThemeProvider, {
 			theme = props.theme,
-		}, props[Roact.Children])
+		}, {
+			Roact.createElement(ActionProvider, {
+				actions = props.actions,
+			}, props[Roact.Children])
+		}),
 	})
 end
 
