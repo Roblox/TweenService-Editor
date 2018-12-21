@@ -123,7 +123,7 @@ function TweenUtilities:PlayTweens(callback)
 		end
 		if tweensDone then
 			local allDone = true
-			for _, props in pairs(delayedTweens) do
+			for _, props in pairs(self.tweens) do
 				local tween = props.Tween
 				if tween.PlaybackState == Enum.PlaybackState.Playing then
 					allDone = false

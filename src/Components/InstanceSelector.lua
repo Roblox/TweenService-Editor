@@ -25,7 +25,7 @@ function InstanceSelector:render(props)
 		text = "Please select only one instance."
 	elseif #selection == 1 then
 		canSelect = true
-		text = "Root: " .. selection[1]:GetFullName()
+		text = "Root: " .. selection[1].Name
 	else
 		text = "Select an instance to begin animating."
 	end
