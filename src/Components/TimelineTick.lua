@@ -30,7 +30,7 @@ function TimelineTick:render()
 			LayoutOrder = self.props.LayoutOrder,
 			ZIndex = playhead and 5 or 3,
 		}, {
-			Label = Roact.createElement("TextLabel", {
+			Label = show and Roact.createElement("TextLabel", {
 				AnchorPoint = Vector2.new(0.5, 0),
 				Size = UDim2.new(0, 25, 0, 20),
 				BackgroundColor3 = playhead and theme.playhead or theme.timeline.background,

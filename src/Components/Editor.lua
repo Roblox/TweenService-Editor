@@ -11,6 +11,7 @@ local withTheme = require(Plugin.Src.Consumers.withTheme)
 local visitDescendants = require(Plugin.Src.Util.visitDescendants)
 local visitChildren = require(Plugin.Src.Util.visitChildren)
 local PathUtils = require(Plugin.Src.Util.PathUtils)
+local clamp = require(Plugin.Src.Util.clamp)
 --local getMouse = require(Plugin.Src.Consumers.getMouse)
 
 local Header = require(Plugin.Src.Components.Header)
@@ -22,12 +23,20 @@ local Editor = Roact.PureComponent:extend("Editor")
 function Editor:init()
 	self.state = {
 		Width = 0,
+		StartIndex = 1,
 	}
 	self.frameRef = Roact.createRef()
 
 	self.sizeChanged = function(rbx)
 		self:setState({
 			Width = self.frameRef.current.AbsoluteSize.X
+		})
+	end
+
+	self.onScroll = function(delta, numItems)
+		local newStart = clamp(self.state.StartIndex - delta, 1, numItems)
+		self:setState({
+			StartIndex = newStart,
 		})
 	end
 end
@@ -41,6 +50,7 @@ end
 function Editor:render()
 	local selection = self.props.Selection and #self.props.Selection == 1 and self.props.Selection[1]
 	local width = self.state.Width
+	local startIndex = self.state.StartIndex or 1
 
 	return withTheme(function(theme)
 		local currentTable = self.props.CurrentTable
@@ -96,6 +106,7 @@ function Editor:render()
 				VerticalAlignment = Enum.VerticalAlignment.Top,
 			}),
 			Header = Roact.createElement(Header, {
+				ButtonPressed = self.props.HeaderButtonPressed,
 			}),
 			Body = Roact.createElement("Frame", {
 				BackgroundColor3 = theme.backgroundColor,
@@ -115,11 +126,14 @@ function Editor:render()
 				PropsList = Roact.createElement(PropsList, {
 					CurrentInstance = self.props.CurrentInstance,
 					ListItems = listItems,
+					StartIndex = startIndex,
+					OnScroll = self.onScroll,
 				}),
 				Timeline = Roact.createElement(Timeline, {
 					CurrentTable = self.props.CurrentTable,
 					Width = width,
 					ListItems = listItems,
+					StartIndex = startIndex,
 				}),
 			}),
 		})

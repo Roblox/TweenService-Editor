@@ -18,6 +18,12 @@ function PropsList:init()
 	self.iterator = 0
 	self.iterator2 = 0
 	self.listItems = nil
+
+	self.inputChanged = function(rbx, input)
+		if input.UserInputType == Enum.UserInputType.MouseWheel then
+			self.props.OnScroll(input.Position.Z, #self.props.ListItems)
+		end
+	end
 end
 
 function PropsList:AddPropertyItem(name, path, instance, root)
@@ -68,6 +74,7 @@ function PropsList:render()
 		self.iterator2 = 1
 		self.listItems = nil
 		local currentInstance = self.props.CurrentInstance
+		local startIndex = self.props.StartIndex
 
 		self.listItems = {
 			Layout = Roact.createElement("UIListLayout", {
@@ -80,15 +87,26 @@ function PropsList:render()
 				BackgroundColor3 = theme.timeline.background,
 				BorderSizePixel = 0,
 				LayoutOrder = 0,
+			}, {
+				HiddenItems = startIndex > 1 and Roact.createElement("TextLabel", {
+					Text = string.format("Hidden items (%i) - Scroll up to show", startIndex - 1),
+					Font = Enum.Font.Gotham,
+					TextSize = 12,
+					TextColor3 = theme.dimmedText,
+					Size = UDim2.new(1, 0, 1, 0),
+					BackgroundTransparency = 1,
+				}),
 			}),
 		}
 
-		for _, item in pairs(self.props.ListItems) do
-			if item.Type == "Property" then
-				self:AddPropertyItem(item.Name, item.Path, item.Instance, currentInstance)
-			elseif item.Type == "Instance" then
-				self:AddInstanceItem(currentInstance, item.Instance, item.Path, item.Selected,
-					item.Props or item.Children, item.Expanded, theme.listItem.na)
+		for i, item in ipairs(self.props.ListItems) do
+			if i >= startIndex then
+				if item.Type == "Property" then
+					self:AddPropertyItem(item.Name, item.Path, item.Instance, currentInstance)
+				elseif item.Type == "Instance" then
+					self:AddInstanceItem(currentInstance, item.Instance, item.Path, item.Selected,
+						item.Props or item.Children, item.Expanded, theme.listItem.na)
+				end
 			end
 		end
 
@@ -99,6 +117,8 @@ function PropsList:render()
 			BackgroundColor3 = theme.propsList.background,
 			BorderColor3 = theme.propsList.border,
 			BorderSizePixel = 3,
+
+			[Roact.Event.InputChanged] = self.inputChanged,
 		}, self.listItems)
 	end)
 end

@@ -24,9 +24,9 @@ function TimelineScale:init()
 		local start = self.props.Start
 
 		local xpos = input.Position.X - self.frameRef.current.AbsolutePosition.X
-		local scaled = (xpos / (scale * 10)) + start
+		local scaled = (xpos / (scale * 10))
 
-		scaled = math.floor((scaled * 10) + 0.5) / 10
+		scaled = (math.floor((scaled * 10) + 0.5) / 10) + (start / 10)
 		self.props.OnDrag(scaled, doneDragging)
 	end
 

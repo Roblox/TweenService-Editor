@@ -10,7 +10,7 @@ local SetSelectedKeyframe = require(Plugin.Src.Actions.SetSelectedKeyframe)
 return function()
 	return function(store)
 		local selected = store:getState().Status.SelectedKeyframe
-		if selected == nil then
+		if selected == nil or selected.Index == 0 then
 			return
 		end
 

@@ -34,9 +34,9 @@ function Keyframe:init()
 			local start = self.props.Start
 
 			local xpos = input.Position.X - offset
-			local scaled = (xpos / (scale * 10)) + start
+			local scaled = xpos / (scale * 10)
 
-			scaled = math.floor((scaled * 10) + 0.5) / 10
+			scaled = (math.floor((scaled * 10) + 0.5) / 10) + (start / 10)
 
 			self:setState({
 				TimeDrag = scaled,
@@ -84,7 +84,7 @@ function Keyframe:render()
 		local time = (self.state.Dragging and self.state.TimeDrag) or self.props.Time
 		local selected = self.props.Selected
 
-		local xpos = start + (time * (scale * 10)) + Constants.TIMELINE_PADDING
+		local xpos = (time * (scale * 10)) - (start * scale) + Constants.TIMELINE_PADDING
 
 		return Roact.createElement("Frame", {
 			BackgroundTransparency = 1,

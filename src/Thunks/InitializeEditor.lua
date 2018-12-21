@@ -12,6 +12,9 @@ local SetInstanceStates = require(Plugin.Src.Actions.SetInstanceStates)
 local SetTweens = require(Plugin.Src.Actions.SetTweens)
 local visitDescendants = require(Plugin.Src.Util.visitDescendants)
 local fixCollisions = require(Plugin.Src.Util.fixCollisions)
+local SetDirty = require(Plugin.Src.Actions.SetDirty)
+local SelectKeyframe = require(Plugin.Src.Thunks.SelectKeyframe)
+local SetPlayhead = require(Plugin.Src.Actions.SetPlayhead)
 
 return function(instance)
 	return function(store)
@@ -48,5 +51,8 @@ return function(instance)
 		end)
 
 		store:dispatch(SetInstanceStates(instanceStates))
+		store:dispatch(SelectKeyframe(nil))
+		store:dispatch(SetPlayhead(0))
+		store:dispatch(SetDirty(false))
 	end
 end

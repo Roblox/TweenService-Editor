@@ -18,6 +18,8 @@ local SetPolling = require(Plugin.Src.Actions.SetPolling)
 local ToggleExpanded = require(Plugin.Src.Actions.ToggleExpanded)
 local SetSelectedKeyframe = require(Plugin.Src.Actions.SetSelectedKeyframe)
 local SetPlayhead = require(Plugin.Src.Actions.SetPlayhead)
+local SetDirty = require(Plugin.Src.Actions.SetDirty)
+local SetTweens = require(Plugin.Src.Actions.SetTweens)
 
 local function Status(state, action)
 	state = state or {
@@ -29,6 +31,7 @@ local function Status(state, action)
 		InstanceStates = {},
 		SelectedKeyframe = nil,
 		Playhead = 0,
+		Dirty = false,
 	}
 
 	if action.type == SetHasFocus.name then
@@ -78,6 +81,14 @@ local function Status(state, action)
 				Playhead = 0,
 			})
 		end
+	elseif action.type == SetDirty.name then
+		return Cryo.Dictionary.join(state, {
+			Dirty = action.value,
+		})
+	elseif action.type == SetTweens.name then
+		return Cryo.Dictionary.join(state, {
+			Dirty = true,
+		})
 	end
 
 	return state

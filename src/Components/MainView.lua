@@ -12,6 +12,7 @@ local BottomDrawer = require(Plugin.Src.Components.BottomDrawer)
 local Exporting = require(Plugin.Src.Util.Exporting)
 local PathUtils = require(Plugin.Src.Util.PathUtils)
 local AddProperty = require(Plugin.Src.Thunks.AddProperty)
+local SaveAll = require(Plugin.Src.Thunks.SaveAll)
 
 local InitializeEditor = require(Plugin.Src.Thunks.InitializeEditor)
 local DescendantRemoving = require(Plugin.Src.Thunks:WaitForChild'DescendantRemoving')
@@ -72,6 +73,16 @@ function MainView:init()
 		end
 	end
 
+	self.headerButtonPressed = function(button)
+		if button == "SaveAll" then
+			self.props.SaveAll()
+		elseif button == "Reload" then
+			if self.props.CurrentInstance then
+				self.props.InitializeEditor(self.props.CurrentInstance)
+			end
+		end
+	end
+
 	self.selectionConnection = game.Selection.SelectionChanged:Connect(self.selectionChanged)
 	self.addedConnection = nil
 	self.removedConnection = nil
@@ -126,6 +137,7 @@ function MainView:render(props)
 				CurrentInstance = currentInstance,
 				Selection = selection,
 				InstanceStates = self.props.InstanceStates,
+				HeaderButtonPressed = self.headerButtonPressed,
 			}),
 			BottomDrawer = editorOpen and polling and Roact.createElement(BottomDrawer, {
 				Header = "Please enter the name of the Property to add to " .. polling.Path .. ":",
@@ -162,6 +174,9 @@ MainView = RoactRodux.connect(
 				if not result and err then
 					warn(err)
 				end
+			end,
+			SaveAll = function()
+				dispatch(SaveAll())
 			end,
 		}
 	end

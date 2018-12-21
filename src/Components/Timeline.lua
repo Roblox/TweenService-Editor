@@ -26,6 +26,7 @@ function Timeline:init()
 	self.iterator = 0
 	self.iterator2 = 0
 	self.listItems = nil
+	self.middleMouseDragging = false
 	self.state = {
 		Scale = 50,
 		Start = 0,
@@ -46,6 +47,15 @@ function Timeline:init()
 		end
 	end
 
+	self.dragStart = function(move)
+		local start = self.state.Start
+		if self.middleMouseDragging then
+			self:setState({
+				Start = clamp(start - move, 0, 600)
+			})
+		end
+	end
+
 	self.inputChanged = function(rbx, input)
 		if input.UserInputType == Enum.UserInputType.MouseWheel then
 			local scale = self.state.Scale
@@ -53,6 +63,21 @@ function Timeline:init()
 			self:setState({
 				Scale = newScale
 			})
+		elseif input.UserInputType == Enum.UserInputType.MouseMovement then
+			local move = math.floor(input.Delta.X * 10) / 10
+			self.dragStart(move)
+		end
+	end
+
+	self.inputBegan = function(rbx, input)
+		if input.UserInputType == Enum.UserInputType.MouseButton3 then
+			self.middleMouseDragging = true
+		end
+	end
+
+	self.inputEnded = function(rbx, input)
+		if input.UserInputType == Enum.UserInputType.MouseButton3 then
+			self.middleMouseDragging = false
 		end
 	end
 
@@ -137,6 +162,7 @@ function Timeline:render()
 		self.listItems = nil
 		local scale = self.state.Scale
 		local start = self.state.Start
+		local startIndex = self.props.StartIndex
 
 		self.listItems = {
 			Layout = Roact.createElement("UIListLayout", {
@@ -152,11 +178,13 @@ function Timeline:render()
 			}),
 		}
 
-		for _, item in pairs(self.props.ListItems) do
-			if item.Type == "Property" then
-				self:AddPropertyItem(item)
-			elseif item.Type == "Instance" then
-				self:AddInstanceItem(item.Instance, item.Selected, theme.listItem.na)
+		for i, item in ipairs(self.props.ListItems) do
+			if i >= startIndex then
+				if item.Type == "Property" then
+					self:AddPropertyItem(item)
+				elseif item.Type == "Instance" then
+					self:AddInstanceItem(item.Instance, item.Selected, theme.listItem.na)
+				end
 			end
 		end
 
@@ -166,9 +194,12 @@ function Timeline:render()
 			Size = UDim2.new(1, 0, 1, 0),
 			BackgroundTransparency = 0,
 			BackgroundColor3 = theme.listItem.na,
+			ClipsDescendants = true,
 			LayoutOrder = 2,
 
 			[Roact.Event.InputChanged] = self.inputChanged,
+			[Roact.Event.InputBegan] = self.inputBegan,
+			[Roact.Event.InputEnded] = self.inputEnded,
 		}, {
 			Scale = Roact.createElement(TimelineScale, {
 				Scale = scale,

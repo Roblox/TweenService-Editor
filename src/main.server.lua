@@ -13,6 +13,7 @@ local MainReducer = require(Plugin.Src.Reducers.MainReducer)
 local MainView = require(Plugin.Src.Components.MainView)
 local Theme = require(Plugin.Src.Util.Theme)
 local SetIsOpen = require(Plugin.Src.Actions.SetIsOpen)
+local SetHasFocus = require(Plugin.Src.Actions.SetHasFocus)
 
 local pluginGui
 local tweenEditorHandle
@@ -84,6 +85,14 @@ local function main()
 	mainButton:SetActive(pluginGui.Enabled)
 	pluginGui:GetPropertyChangedSignal("Enabled"):Connect(function()
 		mainButton:SetActive(pluginGui.Enabled)
+	end)
+
+	pluginGui.WindowFocused:Connect(function()
+		mainStore:dispatch(SetHasFocus(true))
+	end)
+
+	pluginGui.WindowFocusReleased:Connect(function()
+		mainStore:dispatch(SetHasFocus(false))
 	end)
 
 	mainButton.Enabled = true

@@ -103,6 +103,13 @@ function Theme:recalculateTheme()
 			border = color(c.Border),
 		},
 
+		headerButton = {
+			background = color(c.Button),
+			border = color(c.Border),
+			text = color(c.MainText),
+			highlight = Constants.BLUE,
+		},
+
 		keyframe = {
 			background = color(c.Light),
 			border = color(c.Dark),
