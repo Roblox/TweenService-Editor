@@ -60,13 +60,15 @@ function HeaderDropdown:render()
 		}
 
 		if open then
-			table.insert(buttons, Roact.createElement(HeaderDropdownEntry, {
-				Text = "New...",
-				Width = self.props.Width,
-				LayoutOrder = 0,
-				Current = false,
-				OnClick = self.createTween,
-			}))
+			if self.props.AddNew then
+				table.insert(buttons, Roact.createElement(HeaderDropdownEntry, {
+					Text = "New...",
+					Width = self.props.Width,
+					LayoutOrder = 0,
+					Current = false,
+					OnClick = self.createTween,
+				}))
+			end
 			for i, entry in ipairs(entries) do
 				table.insert(buttons, Roact.createElement(HeaderDropdownEntry, {
 					Text = entry,
@@ -81,7 +83,7 @@ function HeaderDropdown:render()
 		return Roact.createElement("TextButton", {
 			Size = UDim2.new(0, self.props.Width or 20, 0, Constants.HEADER_HEIGHT - 4),
 			BorderSizePixel = 1,
-			Text = "  Editing: " .. selectedEntry,
+			Text = "  " .. self.props.Prompt .. selectedEntry,
 			TextTruncate = Enum.TextTruncate.AtEnd,
 			Font = Enum.Font.Gotham,
 			LayoutOrder = self.props.LayoutOrder or 0,
@@ -106,7 +108,8 @@ function HeaderDropdown:render()
 				[Roact.Event.InputBegan] = self.inputBegan,
 			}),
 			Dropdown = open and Roact.createElement("Frame", {
-				Size = UDim2.new(0, self.props.Width, 0, (Constants.HEADER_HEIGHT - 4) * (#entries + 1)),
+				Size = UDim2.new(0, self.props.Width, 0,
+					(Constants.HEADER_HEIGHT - 4) * (#entries + (self.props.AddNew and 1 or 0))),
 				Position = UDim2.new(0, 0, 0, Constants.HEADER_HEIGHT - 4),
 				BackgroundColor3 = theme.headerButton.background,
 				BorderColor3 = theme.headerButton.border,

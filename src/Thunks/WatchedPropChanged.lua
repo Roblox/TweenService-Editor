@@ -47,7 +47,7 @@ end
 
 return function(path, prop, instance)
 	return function(store)
-		if store:getState().Status.HasFocus then
+		if store:getState().Status.HasFocus or store:getState().Status.IsPlaying then
 			--The plugin itself has focus. Most likely during playback.
 			return
 		end

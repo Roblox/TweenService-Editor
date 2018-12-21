@@ -5,13 +5,38 @@ local Cryo = require(Plugin.Cryo)
 
 local Constants = require(Plugin.Src.Util.Constants)
 local withTheme = require(Plugin.Src.Consumers.withTheme)
-local HeaderButton = require(Plugin.Src.Components.HeaderButton)
+--local HeaderButton = require(Plugin.Src.Components.HeaderButton)
+local HeaderImageButton = require(Plugin.Src.Components.HeaderImageButton)
 local HeaderDropdown = require(Plugin.Src.Components.HeaderDropdown)
 local SetCurrentTween = require(Plugin.Src.Thunks.SetCurrentTween)
+local SetEasingStyle = require(Plugin.Src.Thunks.SetEasingStyle)
+local SetEasingDirection = require(Plugin.Src.Thunks.SetEasingDirection)
 local CreateTween = require(Plugin.Src.Thunks.CreateTween)
 --local getMouse = require(Plugin.Src.Consumers.getMouse)
 
 local Header = Roact.PureComponent:extend("Header")
+
+local EASING_STYLES
+local EASING_DIRECTIONS
+local DELETE_IMAGE = "rbxassetid://2668515891"
+local RENAME_IMAGE = "rbxassetid://2668514876"
+local DELETE_KF_IMAGE = "rbxassetid://2668515160"
+local SAVE_IMAGE = "rbxassetid://2668572481"
+local PREVIEW_IMAGE = "rbxassetid://2668578577"
+
+function Header:init()
+	local styles = {}
+	for _, item in pairs(Enum.EasingStyle:GetEnumItems()) do
+		table.insert(styles, item.Name)
+	end
+	EASING_STYLES = styles
+
+	local directions = {}
+	for _, item in pairs(Enum.EasingDirection:GetEnumItems()) do
+		table.insert(directions, item.Name)
+	end
+	EASING_DIRECTIONS = directions
+end
 
 local function makeSeparator(color, index)
 	return Roact.createElement("Frame", {
@@ -25,6 +50,17 @@ end
 
 function Header:render()
 	return withTheme(function(theme)
+		local selectedKeyframe = self.props.SelectedKeyframe and self.props.SelectedKeyframe.Index > 0
+		local selectedStyle, selectedDirection
+		if selectedKeyframe then
+			local skf = self.props.SelectedKeyframe
+			local tweens = self.props.Tweens
+			local currentTween = tweens[self.props.CurrentTween]
+			local current = currentTween[skf.Path][skf.Prop].Keyframes[skf.Index]
+			selectedStyle = current.EasingStyle
+			selectedDirection = current.EasingDirection
+		end
+
 		return Roact.createElement("Frame", {
 			Size = UDim2.new(1, 0, 0, Constants.HEADER_HEIGHT),
 			BackgroundColor3 = theme.header.background,
@@ -36,14 +72,13 @@ function Header:render()
 				SortOrder = Enum.SortOrder.LayoutOrder,
 				FillDirection = Enum.FillDirection.Horizontal,
 				HorizontalAlignment = Enum.HorizontalAlignment.Left,
-				Padding = UDim.new(0, 10),
+				Padding = UDim.new(0, 8),
 			}),
 			Padding = Roact.createElement("UIPadding", {
 				PaddingLeft = UDim.new(0, 10),
 			}),
-			SaveAll = Roact.createElement(HeaderButton, {
-				Width = 80,
-				Text = "Save All",
+			SaveAll = Roact.createElement(HeaderImageButton, {
+				Image = SAVE_IMAGE,
 				Tooltip = "Save and export all changes.",
 				LayoutOrder = 1,
 				Highlight = self.props.Dirty,
@@ -51,41 +86,68 @@ function Header:render()
 					self.props.ButtonPressed("SaveAll")
 				end,
 			}),
-			Reload = Roact.createElement(HeaderButton, {
-				Width = 80,
-				Text = "Reload",
-				Tooltip = "Delete changes and sync with exported tweens.",
+			Preview = Roact.createElement(HeaderImageButton, {
+				Image = PREVIEW_IMAGE,
+				Tooltip = "Preview the current tween.",
 				LayoutOrder = 2,
+				OnClick = function()
+					self.props.ButtonPressed("Preview")
+				end,
+			}),
+			ReloadSeparator = makeSeparator(theme.header.border, 3),
+			Reload = Roact.createElement(HeaderImageButton, {
+				Image = DELETE_IMAGE,
+				Tooltip = "Delete changes and sync with exported tweens.",
+				LayoutOrder = 4,
 				OnClick = function()
 					self.props.ButtonPressed("Reload")
 				end,
 			}),
-			Separator = makeSeparator(theme.header.border, 3),
+			Separator = makeSeparator(theme.header.border, 5),
 			Tweens = Roact.createElement(HeaderDropdown, {
 				Width = 175,
-				Entries = self.props.Tweens,
+				Entries = Cryo.Dictionary.keys(self.props.Tweens),
 				SelectedEntry = self.props.CurrentTween,
-				LayoutOrder = 4,
+				LayoutOrder = 6,
 				SelectEntry = self.props.SetCurrentTween,
 				CreateTween = self.props.CreateTween,
+				AddNew = true,
+				Prompt = "Editing: "
 			}),
-			Rename = Roact.createElement(HeaderButton, {
-				Width = 80,
+			Rename = Roact.createElement(HeaderImageButton, {
+				Image = RENAME_IMAGE,
 				Text = "Rename",
 				Tooltip = "Rename the current tween.",
-				LayoutOrder = 5,
+				LayoutOrder = 7,
 				OnClick = function()
 					self.props.ButtonPressed("Rename")
 				end,
 			}),
-			Delete = Roact.createElement(HeaderButton, {
-				Width = 80,
+			Delete = Roact.createElement(HeaderImageButton, {
+				Image = DELETE_KF_IMAGE,
 				Text = "Delete",
 				Tooltip = "Delete the current tween.",
-				LayoutOrder = 6,
+				LayoutOrder = 8,
 				OnClick = function()
 					self.props.ButtonPressed("Delete")
 				end,
+			}),
+			Separator2 = selectedKeyframe and makeSeparator(theme.header.border, 7),
+			EasingStyle = selectedKeyframe and Roact.createElement(HeaderDropdown, {
+				Width = 153,
+				Entries = EASING_STYLES,
+				SelectedEntry = selectedStyle.Name,
+				LayoutOrder = 9,
+				SelectEntry = self.props.SetEasingStyle,
+				Prompt = "EasingStyle: "
+			}),
+			EasingDirection = selectedKeyframe and Roact.createElement(HeaderDropdown, {
+				Width = 170,
+				Entries = EASING_DIRECTIONS,
+				SelectedEntry = selectedDirection.Name,
+				LayoutOrder = 10,
+				SelectEntry = self.props.SetEasingDirection,
+				Prompt = "EasingDirection: "
 			}),
 		})
 	end)
@@ -97,7 +159,8 @@ Header = RoactRodux.connect(
 		return {
 			Dirty = state.Status.Dirty,
 			CurrentTween = state.Tweens.CurrentTween,
-			Tweens = Cryo.Dictionary.keys(state.Tweens.Tweens),
+			Tweens = state.Tweens.Tweens,
+			SelectedKeyframe = state.Status.SelectedKeyframe,
 		}
 	end,
 	function(dispatch)
@@ -107,6 +170,12 @@ Header = RoactRodux.connect(
 			end,
 			CreateTween = function()
 				dispatch(CreateTween())
+			end,
+			SetEasingStyle = function(style)
+				dispatch(SetEasingStyle(style))
+			end,
+			SetEasingDirection = function(direction)
+				dispatch(SetEasingDirection(direction))
 			end,
 		}
 	end

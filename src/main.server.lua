@@ -1,7 +1,7 @@
 local ICON = "rbxassetid://2658642540"
 local DOCK_WIDGET_INFO = DockWidgetPluginGuiInfo.new(
 	Enum.InitialDockState.Bottom,
-	false, false, 800, 250, 400, 200
+	false, true, 800, 250, 400, 200
 )
 local LOG_STORE_STATE_AND_EVENTS = false
 
@@ -14,6 +14,7 @@ local MainView = require(Plugin.Src.Components.MainView)
 local Theme = require(Plugin.Src.Util.Theme)
 local SetIsOpen = require(Plugin.Src.Actions.SetIsOpen)
 local SetHasFocus = require(Plugin.Src.Actions.SetHasFocus)
+local Exporting = require(Plugin.Src.Util.Exporting)
 
 local pluginGui
 local tweenEditorHandle
@@ -57,6 +58,8 @@ local function openTweenEditor()
 
 	tweenEditorHandle = Roact.mount(servicesProvider, pluginGui)
 	pluginGui.Enabled = true
+
+	Exporting.ExportIncludes()
 end
 
 local function toggleView()
@@ -78,7 +81,7 @@ local function main()
 	local toolbar = plugin:CreateToolbar("TweenService")
 	local mainButton = toolbar:CreateButton(
 		"TweenSequence Editor",
-		"Easily create Tweens for animating almost anything",
+		"Create sequences of Tweens for animating objects",
 		ICON
 	)
 

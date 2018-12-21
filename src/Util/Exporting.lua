@@ -12,7 +12,7 @@ local Exporting = {}
 
 function Exporting.ExportIncludes()
 	local TweenSequenceUtils = CollectionService:GetTagged(INCLUDES_TAG)
-	if #TweenSequenceUtils == 0 then
+	if #TweenSequenceUtils < 1 then
 		local newIncludes = Plugin.Src.TweenSequenceIncludes:Clone()
 		CollectionService:AddTag(newIncludes, INCLUDES_TAG)
 		newIncludes.Parent = game.ReplicatedStorage
@@ -32,6 +32,7 @@ function Exporting.GetAnimator(instance)
 end
 
 function Exporting.ExportAnimator(instance)
+	Exporting.ExportIncludes()
 	local animator = Exporting.GetAnimator(instance)
 	if animator == nil then
 		local newAnimator = Plugin.Src.Animator.Animator:Clone()
@@ -75,6 +76,7 @@ function Exporting.ExportTween(tweenInfo, name, parent)
 end
 
 function Exporting.SaveAll(root, tweens)
+	Exporting.DeleteAll(root)
 	local animator = Exporting.ExportAnimator(root)
 	animator.Tweens:ClearAllChildren()
 	for name, tween in pairs(tweens) do

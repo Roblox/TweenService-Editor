@@ -16,6 +16,7 @@ local SaveAll = require(Plugin.Src.Thunks.SaveAll)
 local SetTweenName = require(Plugin.Src.Thunks.SetTweenName)
 local StartRenameTween = require(Plugin.Src.Thunks.StartRenameTween)
 local DeleteTween = require(Plugin.Src.Thunks.DeleteTween)
+local PreviewTween = require(Plugin.Src.Thunks.PreviewTween)
 
 local InitializeEditor = require(Plugin.Src.Thunks.InitializeEditor)
 local DescendantRemoving = require(Plugin.Src.Thunks:WaitForChild'DescendantRemoving')
@@ -89,6 +90,8 @@ function MainView:init()
 			self.props.StartRenameTween()
 		elseif button == "Delete" then
 			self.props.DeleteTween()
+		elseif button == "Preview" then
+			self.props.PreviewTween()
 		end
 	end
 
@@ -199,6 +202,9 @@ MainView = RoactRodux.connect(
 			end,
 			DeleteTween = function()
 				dispatch(DeleteTween())
+			end,
+			PreviewTween = function()
+				dispatch(PreviewTween())
 			end,
 			SaveAll = function()
 				dispatch(SaveAll())

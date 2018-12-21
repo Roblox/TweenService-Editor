@@ -19,6 +19,7 @@ local SetPlayhead = require(Plugin.Src.Actions.SetPlayhead)
 local Keyframe = require(Plugin.Src.Components.Keyframe)
 local clamp = require(Plugin.Src.Util.clamp)
 local getActions = require(Plugin.Src.Consumers.getActions)
+local UpdateInstances = require(Plugin.Src.Thunks.UpdateInstances)
 
 local Timeline = Roact.PureComponent:extend("Timeline")
 
@@ -30,21 +31,10 @@ function Timeline:init()
 	self.state = {
 		Scale = 50,
 		Start = 0,
-		PlayheadDrag = nil,
 	}
 
 	self.dragPlayhead = function(time, doneDragging)
-		if doneDragging then
-			self.props.SetPlayhead(time)
-			wait()
-			self:setState({
-				PlayheadDrag = Roact.None,
-			})
-		else
-			self:setState({
-				PlayheadDrag = time,
-			})
-		end
+		self.props.SetPlayhead(time)
 	end
 
 	self.dragStart = function(move)
@@ -205,7 +195,7 @@ function Timeline:render()
 				Scale = scale,
 				Start = start,
 				Width = self.props.Width,
-				Playhead = self.state.PlayheadDrag or self.props.Playhead,
+				Playhead = self.props.Playhead,
 				OnDrag = self.dragPlayhead,
 			}),
 			List = Roact.createElement("Frame", {
@@ -232,6 +222,7 @@ Timeline = RoactRodux.connect(
 			SetPlayhead = function(playhead)
 				dispatch(SetPlayhead(playhead))
 				dispatch(SelectKeyframe(nil))
+				dispatch(UpdateInstances())
 			end,
 			DeleteSelectedKeyframe = function()
 				dispatch(DeleteSelectedKeyframe())

@@ -16,6 +16,9 @@ return function(newName)
 		if newName ~= "" then
 			local tweens = store:getState().Tweens.Tweens
 			local currentTween = store:getState().Tweens.CurrentTween
+			if newName == currentTween then
+				return
+			end
 			local tweenTable = tweens[currentTween]
 
 			local newTweens = Cryo.Dictionary.join(tweens, {

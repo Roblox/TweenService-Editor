@@ -15,6 +15,7 @@ local fixCollisions = require(Plugin.Src.Util.fixCollisions)
 local SetDirty = require(Plugin.Src.Actions.SetDirty)
 local SelectKeyframe = require(Plugin.Src.Thunks.SelectKeyframe)
 local SetPlayhead = require(Plugin.Src.Actions.SetPlayhead)
+local UpdateInstances = require(Plugin.Src.Thunks.UpdateInstances)
 
 return function(instance)
 	return function(store)
@@ -57,6 +58,7 @@ return function(instance)
 		store:dispatch(SetInstanceStates(instanceStates))
 		store:dispatch(SelectKeyframe(nil))
 		store:dispatch(SetPlayhead(0))
+		store:dispatch(UpdateInstances())
 		store:dispatch(SetDirty(false))
 	end
 end
