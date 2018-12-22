@@ -19,9 +19,9 @@ local function prettyPrint(val)
 	elseif typeof(val) == "Color3" then
 		return string.format("Color3.new(%s)", tostring(val))
 	elseif typeof(val) == "UDim" then
-		return string.format("UDim.new(%d, %d)", val.Scale, val.Offset)
+		return string.format("UDim.new(%s, %s)", val.Scale, val.Offset)
 	elseif typeof(val) == "UDim2" then
-		return string.format("UDim2.new(%d, %d, %d, %d)", val.X.Scale, val.X.Offset, val.Y.Scale, val.Y.Offset)
+		return string.format("UDim2.new(%s, %s, %s, %s)", val.X.Scale, val.X.Offset, val.Y.Scale, val.Y.Offset)
 	else
 		return tostring(val)
 	end
@@ -57,8 +57,8 @@ local function WriteTween(tweenTable, name)
 					end
 					tween, indent = addLineClose(indent, tween, true)
 				end
-			tween, indent = addLineClose(indent, tween)
-			tween, indent = addLineClose(indent, tween)
+			tween, indent = addLineClose(indent, tween, true)
+			tween, indent = addLineClose(indent, tween, true)
 		end
 		tween, indent = addLineClose(indent, tween)
 	end

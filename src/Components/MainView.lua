@@ -152,13 +152,13 @@ function MainView:render(props)
 				HeaderButtonPressed = self.headerButtonPressed,
 			}),
 			PollProperty = editorOpen and polling and polling.Value == "Property" and Roact.createElement(BottomDrawer, {
-				Header = "Please enter the name of the Property to add to " .. polling.Path .. ":",
+				Header = "Enter the name of the Property to add to " .. polling.Path .. ":",
 				FocusChanged = self.drawerFocusChanged,
 				Submitted = self.drawerSubmitted,
 				ButtonName = "Add",
 			}),
 			PollName = editorOpen and polling and polling.Value == "Name" and Roact.createElement(BottomDrawer, {
-				Header = "Please enter the name of the new name for " .. polling.Tween .. ":",
+				Header = "Enter the new name for " .. polling.Tween .. ":",
 				FocusChanged = self.drawerFocusChanged,
 				Submitted = self.drawerSubmitted,
 				ButtonName = "Rename",

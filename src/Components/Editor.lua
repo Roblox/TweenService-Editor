@@ -78,14 +78,21 @@ function Editor:render()
 					})
 					if state.Expanded then
 						if props then
+							local sortedProps = {}
 							for name in pairs(props) do
-								table.insert(listItems, {
+								table.insert(sortedProps, {
 									Type = "Property",
 									Instance = instance,
 									Path = relativePath,
 									Values = props[name],
 									Name = name,
 								})
+							end
+							table.sort(sortedProps, function(e1, e2)
+								return e1.Name > e2.Name
+							end)
+							for _, prop in pairs(sortedProps) do
+								table.insert(listItems, prop)
 							end
 						end
 					end

@@ -48,7 +48,7 @@ function PropsList:AddInstanceItem(root, instance, path, selected, expandable, e
 		Indentation = PathUtils.StepsFromRoot(path),
 		Instance = instance,
 		Root = root,
-		Name = instance.Name,
+		Name = instance == root and (instance.Name .. " (Root)") or instance.Name,
 		Expanded = expanded,
 		Expandable = expandable,
 		Selected = selected,

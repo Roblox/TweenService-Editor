@@ -18,7 +18,9 @@ function PathUtils.RelativePath(root, instance)
 	local path = instance.Name
 	while instance ~= root and instance ~= nil do
 		instance = instance.Parent
-		if instance ~= nil then
+		if instance == root then
+			path = "Root." .. path
+		elseif instance ~= nil then
 			path = instance.Name .. "." .. path
 		else
 			return nil

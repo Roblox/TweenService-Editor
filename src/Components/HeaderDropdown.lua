@@ -39,6 +39,11 @@ function HeaderDropdown:init()
 		self.close()
 		self.props.CreateTween()
 	end
+
+	self.copyTween = function()
+		self.close()
+		self.props.CopyTween()
+	end
 end
 
 function HeaderDropdown:render()
@@ -62,18 +67,25 @@ function HeaderDropdown:render()
 		if open then
 			if self.props.AddNew then
 				table.insert(buttons, Roact.createElement(HeaderDropdownEntry, {
-					Text = "New...",
+					Text = "Create New...",
 					Width = self.props.Width,
 					LayoutOrder = 0,
 					Current = false,
 					OnClick = self.createTween,
+				}))
+				table.insert(buttons, Roact.createElement(HeaderDropdownEntry, {
+					Text = "Copy Current...",
+					Width = self.props.Width,
+					LayoutOrder = 1,
+					Current = false,
+					OnClick = self.copyTween,
 				}))
 			end
 			for i, entry in ipairs(entries) do
 				table.insert(buttons, Roact.createElement(HeaderDropdownEntry, {
 					Text = entry,
 					Width = self.props.Width,
-					LayoutOrder = i,
+					LayoutOrder = i + 1,
 					Current = entry == selectedEntry,
 					OnClick = self.selectEntry,
 				}))
@@ -109,7 +121,7 @@ function HeaderDropdown:render()
 			}),
 			Dropdown = open and Roact.createElement("Frame", {
 				Size = UDim2.new(0, self.props.Width, 0,
-					(Constants.HEADER_HEIGHT - 4) * (#entries + (self.props.AddNew and 1 or 0))),
+					(Constants.HEADER_HEIGHT - 4) * (#entries + (self.props.AddNew and 2 or 0))),
 				Position = UDim2.new(0, 0, 0, Constants.HEADER_HEIGHT - 4),
 				BackgroundColor3 = theme.headerButton.background,
 				BorderColor3 = theme.headerButton.border,

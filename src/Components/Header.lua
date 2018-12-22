@@ -12,6 +12,7 @@ local SetCurrentTween = require(Plugin.Src.Thunks.SetCurrentTween)
 local SetEasingStyle = require(Plugin.Src.Thunks.SetEasingStyle)
 local SetEasingDirection = require(Plugin.Src.Thunks.SetEasingDirection)
 local CreateTween = require(Plugin.Src.Thunks.CreateTween)
+local CopyTween = require(Plugin.Src.Thunks.CopyTween)
 --local getMouse = require(Plugin.Src.Consumers.getMouse)
 
 local Header = Roact.PureComponent:extend("Header")
@@ -111,6 +112,7 @@ function Header:render()
 				LayoutOrder = 6,
 				SelectEntry = self.props.SetCurrentTween,
 				CreateTween = self.props.CreateTween,
+				CopyTween = self.props.CopyTween,
 				AddNew = true,
 				Prompt = "Editing: "
 			}),
@@ -170,6 +172,9 @@ Header = RoactRodux.connect(
 			end,
 			CreateTween = function()
 				dispatch(CreateTween())
+			end,
+			CopyTween = function()
+				dispatch(CopyTween())
 			end,
 			SetEasingStyle = function(style)
 				dispatch(SetEasingStyle(style))
