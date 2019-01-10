@@ -60,7 +60,7 @@ local function WriteTween(tweenTable, name)
 			tween, indent = addLineClose(indent, tween, true)
 			tween, indent = addLineClose(indent, tween, true)
 		end
-		tween, indent = addLineClose(indent, tween)
+		tween, indent = addLineClose(indent, tween, true)
 	end
 
 	tween = addLineClose(indent, tween)

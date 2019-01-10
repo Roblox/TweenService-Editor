@@ -103,6 +103,7 @@ function Timeline:MakeKeyframe(kf, item, scale, start, index, time)
 		Time = time,
 		Start = start,
 		Selected = selected,
+		Clipboard = self.props.Clipboard ~= nil,
 		OnClick = function()
 			self.props.SelectKeyframe(item.Path, item.Name, index)
 		end,
@@ -206,6 +207,7 @@ function Timeline:render()
 				Width = self.props.Width,
 				Playhead = self.props.Playhead,
 				OnDrag = self.dragPlayhead,
+				Clipboard = self.props.Clipboard ~= nil,
 			}),
 			List = Roact.createElement("Frame", {
 				BackgroundTransparency = 1,
@@ -221,6 +223,7 @@ Timeline = RoactRodux.connect(
 		return {
 			Playhead = state.Status.Playhead,
 			SelectedKeyframe = state.Status.SelectedKeyframe,
+			Clipboard = state.Status.Clipboard,
 		}
 	end,
 	function(dispatch)

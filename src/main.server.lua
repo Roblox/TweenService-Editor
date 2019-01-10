@@ -58,6 +58,7 @@ local function openTweenEditor()
 		theme = Theme.new(),
 		mouse = plugin:GetMouse(),
 		actions = pluginActions,
+		plugin = plugin,
 	}, {
 		mainView = Roact.createElement(MainView),
 	})

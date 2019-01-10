@@ -10,6 +10,8 @@ local Plugin = script.Parent.Parent.Parent
 local Roact = require(Plugin.Roact)
 local withTheme = require(Plugin.Src.Consumers.withTheme)
 local Constants = require(Plugin.Src.Util.Constants)
+local getActions = require(Plugin.Src.Consumers.getActions)
+local getPlugin = require(Plugin.Src.Consumers.getPlugin)
 --local getMouse = require(Plugin.Src.Consumers.getMouse)
 
 local Keyframe = Roact.PureComponent:extend("Keyframe")
@@ -65,6 +67,21 @@ function Keyframe:init()
 		end
 	end
 
+	self.mouseButton2Click = function()
+		self.props.OnClick()
+		local menu = getPlugin(self):CreatePluginMenu("KeyframeContextMenu")
+		local actions = getActions(self)
+
+		menu:AddAction(actions.CopyKeyframe)
+		if self.props.Clipboard then
+			menu:AddAction(actions.PasteKeyframe)
+		end
+		menu:AddAction(actions.DeleteKeyframe)
+
+		menu:ShowAsync()
+		menu:Destroy()
+	end
+
 	self.inputEnded = function(rbx, input)
 		if input.UserInputType == Enum.UserInputType.MouseButton1 then
 			self.reportMousePos(input, true, rbx.AbsolutePosition.X)
@@ -114,6 +131,7 @@ function Keyframe:render()
 				[Roact.Ref] = self.buttonRef,
 				[Roact.Event.InputBegan] = self.inputBegan,
 				[Roact.Event.InputEnded] = self.inputEnded,
+				[Roact.Event.MouseButton2Click] = self.mouseButton2Click,
 				ZIndex = 3,
 			}),
 		})

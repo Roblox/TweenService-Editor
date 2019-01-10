@@ -1,6 +1,6 @@
 --[[
 	TweenSequence Editor Animator
-	Created by ZeroIndex
+	Created by pa00
 
 	Usage:
 		Initialize by requiring this module:

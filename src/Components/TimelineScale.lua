@@ -10,10 +10,22 @@ local Plugin = script.Parent.Parent.Parent
 local Roact = require(Plugin.Roact)
 local withTheme = require(Plugin.Src.Consumers.withTheme)
 local Constants = require(Plugin.Src.Util.Constants)
+local getActions = require(Plugin.Src.Consumers.getActions)
+local getPlugin = require(Plugin.Src.Consumers.getPlugin)
 --local getMouse = require(Plugin.Src.Consumers.getMouse)
 local TimelineTick = require(Plugin.Src.Components.TimelineTick)
 
 local TimelineScale = Roact.PureComponent:extend("TimelineScale")
+
+function TimelineScale:showMenu()
+	local menu = getPlugin(self):CreatePluginMenu("KeyframeContextMenu")
+	local actions = getActions(self)
+
+	menu:AddAction(actions.PasteKeyframe)
+
+	menu:ShowAsync()
+	menu:Destroy()
+end
 
 function TimelineScale:init()
 	self.frameRef = Roact.createRef()
@@ -33,6 +45,11 @@ function TimelineScale:init()
 	self.inputBegan = function(rbx, input)
 		if input.UserInputType == Enum.UserInputType.MouseButton1 then
 			self.dragging = true
+		elseif input.UserInputType == Enum.UserInputType.MouseButton2 then
+			self.reportMousePos(input, true)
+			if self.props.Clipboard then
+				self:showMenu()
+			end
 		end
 	end
 
